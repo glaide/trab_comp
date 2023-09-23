@@ -10,7 +10,7 @@
 #include <string.h>
 #include "compilador.h"
 
-int num_vars;
+int num_vars, novasVariaveis;
 
 %}
 
@@ -19,7 +19,7 @@ int num_vars;
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
 
 %%
-
+/* regra 1 */
 programa    :{
              geraCodigo (NULL, "INPP");
              }
@@ -29,7 +29,7 @@ programa    :{
              geraCodigo (NULL, "PARA");
              }
 ;
-
+/* regra 2 */
 bloco       :
               parte_declara_vars
               {
@@ -40,33 +40,49 @@ bloco       :
 
 
 
-
+/* regra 8 */
 parte_declara_vars:  var
 ;
 
 
 var         : { } VAR declara_vars
-            |
+            | declara_var
 ;
 
 declara_vars: declara_vars declara_var
             | declara_var
 ;
 
-declara_var : { }
+/* regra 9 */
+declara_var : {
+   novasVariaveis= 0;
+}
               lista_id_var DOIS_PONTOS
               tipo
               { /* AMEM */
+               // atualiza quantas variaveis tem
+               num_vars+=novasVariaveis;
+               printf("num de variaveis %d\n", num_vars);
+               //para usar amem tem que saber qual deslocamento
+
               }
               PONTO_E_VIRGULA
 ;
 
 tipo        : IDENT
+/* TODO: colocar o tipo que será salvo na tabela de simbolos */
 ;
 
+/* regra 10 conta quantas variaveis tem */
 lista_id_var: lista_id_var VIRGULA IDENT
-              { /* insere �ltima vars na tabela de s�mbolos */ }
-            | IDENT { /* insere vars na tabela de s�mbolos */}
+              { /* insere ultima vars na tabela de s�mbolos */
+                novasVariaveis++;
+               //  no futuro setar o valor de deslocamento tb
+                }
+            | IDENT { /* insere vars na tabela de s�mbolos */
+              novasVariaveis++;
+               //  no futuro setar o valor de deslocamento tb
+               }
 ;
 
 lista_idents: lista_idents VIRGULA IDENT
