@@ -10,7 +10,7 @@
 #include <string.h>
 #include "compilador.h"
 
-int num_vars, novasVariaveis;
+int num_vars, novasVariaveis, deslocamento;
 
 %}
 
@@ -77,6 +77,9 @@ tipo        : IDENT
 lista_id_var: lista_id_var VIRGULA IDENT
               { /* insere ultima vars na tabela de s�mbolos */
                 novasVariaveis++;
+                deslocamento++;
+               //  add na tabela de simbolos
+
                //  no futuro setar o valor de deslocamento tb
                 }
             | IDENT { /* insere vars na tabela de s�mbolos */
