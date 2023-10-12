@@ -79,7 +79,7 @@ lista_id_var: lista_id_var VIRGULA IDENT
                 novasVariaveis++;
                 deslocamento++;
                //  add na tabela de simbolos
-
+               // criar uma funcao para criar variavel simples
                //  no futuro setar o valor de deslocamento tb
                 }
             | IDENT { /* insere vars na tabela de s�mbolos */

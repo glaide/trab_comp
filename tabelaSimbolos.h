@@ -56,7 +56,9 @@ typedef struct type_tabela_simbolos_pilha
 
 // funcao para criar uma nova tabela de simbolos
 TypeTabelaSimbolosPilha *criar_tabela_simbolos();
-// funcao para adicionar um novo elemento na tabela de simbolos
+// funcao para montar as informacoes para add na tabela de simbolos para cada parametro
+type_infos_tabela_simbolos cria_var_simples(char *identificador, int nivel_lexico, int deslocamento);
+
 void adicionar_elemento_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
 
 #endif
