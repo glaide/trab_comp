@@ -10,14 +10,7 @@
 #include <string.h>
 #include "compilador.h"
 
-#include "tabelaSimbolos.h"
-
 int num_vars, novasVariaveis, deslocamento;
-
-//ADICIONEI AS VARIAVEIS TABALA_SIMBOLOS PARA CHAMARMOS ELA, E A NOVA_ENTRADA COPIEI PQ FAZ SENTIDO,
-//PQ PRECISAMOS SALVAR A NOVA VARIAVEL EM ALGUM LUGAR QUANDO MONTAMOS O NO. 
-TypeTabelaSimbolosPilha tabela_Simbolos;
-type_infos_tabela_simbolos *nova_Entrada;
 
 %}
 
@@ -86,10 +79,7 @@ lista_id_var: lista_id_var VIRGULA IDENT
                 novasVariaveis++;
                 deslocamento++;
                //  add na tabela de simbolos
-               //FIZ QUI O COMENTARIO DE CIMA MAS, NAO FUNCIONA PQ DA ERRO NO NOVA_ENTRADA.
-               nova_Entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
-               push_tabela_simbolos(&tabela_Simbolos, nova_Entrada);
-               
+               // criar uma funcao para criar variavel simples
                //  no futuro setar o valor de deslocamento tb
                 }
             | IDENT { /* insere vars na tabela de s�mbolos */
