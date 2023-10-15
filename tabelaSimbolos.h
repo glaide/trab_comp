@@ -51,14 +51,22 @@ typedef struct type_infos_tabela_simbolos
 typedef struct type_tabela_simbolos_pilha
 {
     int tamanho_pilha;
+    //ADICIONEI O TOPO PQ VAI PRECISAR 
+
+    type_infos_tabela_simbolos *topo;
+
     type_infos_tabela_simbolos **infos; // vetor de ponteiros para tabela de simbolos
 } TypeTabelaSimbolosPilha;
 
-// funcao para criar uma nova tabela de simbolos
-TypeTabelaSimbolosPilha *criar_tabela_simbolos();
-// funcao para montar as informacoes para add na tabela de simbolos para cada parametro
-type_infos_tabela_simbolos cria_var_simples(char *identificador, int nivel_lexico, int deslocamento);
+// funcao para criar uma nova tabela de simbolos, fiz VOID pq criamos uma varivael do tipo tabela no comp.y
+// e passamos ela para criar_tabela_simbolo
+void *criar_tabela_simbolos(TypeTabelaSimbolosPilha *tabelaSimbolos);
+// funcao para adicionar um novo elemento na tabela de simbolos
 
-void adicionar_elemento_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
+type_infos_tabela_simbolos* criaVariavelSimples(char *indentificador, int nivelLexico, int descolocamento);
+
+//void adicionar_elemento_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
+//  Virou push_tabela_simbolos
+void push_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
 
 #endif
