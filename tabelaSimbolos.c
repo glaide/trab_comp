@@ -36,3 +36,19 @@ void push_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simb
     pilha->topo = infos;
     pilha->tamanho_pilha++;
 }
+
+void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha)
+{
+    type_infos_tabela_simbolos *aux = pilha->topo;
+    while (aux != NULL)
+    {
+        printf("Identificador: %s\n", aux->identificador);
+        printf("Nivel Lexico: %d\n", aux->nivel_lexico);
+        printf("Deslocamento: %d\n", aux->deslocamento);
+        printf("Categoria: %d\n", aux->categoria);
+        printf("Tipo: %d\n", aux->type);
+        printf("Prox: %p\n", aux->prox);
+        printf("\n");
+        aux = aux->prox;
+    }
+}

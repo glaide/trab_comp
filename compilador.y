@@ -33,6 +33,7 @@ programa    :{
              PROGRAM IDENT
              ABRE_PARENTESES lista_idents FECHA_PARENTESES PONTO_E_VIRGULA
              bloco PONTO {
+imprime_tabela_simbolos(&tabela_Simbolos);
              geraCodigo (NULL, "PARA");
              }
 ;
@@ -86,7 +87,7 @@ lista_id_var: lista_id_var VIRGULA IDENT
                 novasVariaveis++;
                 deslocamento++;
                //  add na tabela de simbolos
-               //FIZ QUI O COMENTARIO DE CIMA MAS, NAO FUNCIONA PQ DA ERRO NO NOVA_ENTRADA.
+
                nova_Entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_Simbolos, nova_Entrada);
 
@@ -94,6 +95,11 @@ lista_id_var: lista_id_var VIRGULA IDENT
                 }
             | IDENT { /* insere vars na tabela de s�mbolos */
               novasVariaveis++;
+                deslocamento++;
+
+               nova_Entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
+               push_tabela_simbolos(&tabela_Simbolos, nova_Entrada);
+
                //  no futuro setar o valor de deslocamento tb
                }
 ;
