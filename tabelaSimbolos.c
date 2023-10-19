@@ -3,7 +3,7 @@
 // funcao para criar uma nova tabela de simbolos
 void *criar_tabela_simbolos(TypeTabelaSimbolosPilha *tabelaSimbolos)
 {
-
+        //PRECISA DESSE MALLOC?
     TypeTabelaSimbolosPilha *tabela = (TypeTabelaSimbolosPilha *)malloc(sizeof(TypeTabelaSimbolosPilha));
     tabela->tamanho_pilha = 0; // Inicializa o tamanho da pilha como 0
     tabela->infos = NULL;      // Inicializa o vetor de ponteiros como NULL (sem elementos ainda)
