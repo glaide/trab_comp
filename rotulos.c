@@ -12,3 +12,9 @@ void push_tabela_rotulos(pilha_rotulo *pilha, tipo_rotulo *rotulo)
     pilha->topo = rotulo;
     pilha->tamanho++;
 }
+char *cria_rotulo(int rotulo_atual)
+{
+    char *rotulo = (char *)malloc(5 * sizeof(char));
+    sprintf(rotulo, "R%02d", rotulo_atual);
+    return rotulo;
+}

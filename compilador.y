@@ -24,24 +24,32 @@ type_infos_tabela_simbolos *nova_Entrada;
 %token PROGRAM ABRE_PARENTESES FECHA_PARENTESES
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
+%token NUMERO INTEGER
 
 %%
 /* regra 1 */
 programa    :{
              geraCodigo (NULL, "INPP");
              }
-             PROGRAM IDENT
-             ABRE_PARENTESES lista_idents FECHA_PARENTESES PONTO_E_VIRGULA
+             PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA
              bloco PONTO {
-imprime_tabela_simbolos(&tabela_Simbolos);
+         imprime_tabela_simbolos(&tabela_Simbolos);
              geraCodigo (NULL, "PARA");
              }
 ;
+
+parametros_ou_nada: parametros
+                  | nada;
+
+parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES;
+
+nada: ;
 /* regra 2 */
 bloco       :
               parte_declara_vars
               {
               }
+
 
               comando_composto
               ;
@@ -77,7 +85,7 @@ declara_var : {
               PONTO_E_VIRGULA
 ;
 
-tipo        : IDENT
+tipo        : INTEGER {}
 /* TODO: colocar o tipo que será salvo na tabela de simbolos */
 ;
 
@@ -105,14 +113,29 @@ lista_id_var: lista_id_var VIRGULA IDENT
 ;
 
 lista_idents: lista_idents VIRGULA IDENT
+//aqui entram os parametros formais
             | IDENT
 ;
 
-
+/* regra 16 */
 comando_composto: T_BEGIN comandos T_END
-
 comandos:
+	comandos PONTO_E_VIRGULA comando
+	| comando
 ;
+
+/* regra 17 */
+comando: numero_ou_nada;
+
+
+numero_ou_nada: numero DOIS_PONTOS | nada;
+
+numero: NUMERO {
+	// add na tabela de tipos
+	    char totalVars[100];
+		sprintf(totalVars, "CRCT %s", token);
+		geraCodigo(NULL, totalVars);
+}
 
 
 %%
