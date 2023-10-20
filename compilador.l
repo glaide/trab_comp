@@ -119,15 +119,6 @@ end { simbolo = simb_end;
           return IDENT;
         }
 
-while { simbolo = simb_while;
-          strncpy (token, yytext, TAM_TOKEN);
-          IMPRIME(" while  ");
-          return WHILE;
-        }
 
-do { simbolo = simb_do;
-          strncpy (token, yytext, TAM_TOKEN);
-          IMPRIME(" do  ");
-          return DO;
-        }
 %%
+
