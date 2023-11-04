@@ -9,22 +9,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include "compilador.h"
-
+#include "rotulos.h"
 #include "tabelaSimbolos.h"
 
 int num_vars, novasVariaveis, deslocamento, nivel_lexico;
-
-//ADICIONEI AS VARIAVEIS TABALA_SIMBOLOS PARA CHAMARMOS ELA, E A NOVA_ENTRADA COPIEI PQ FAZ SENTIDO,
-//PQ PRECISAMOS SALVAR A NOVA VARIAVEL EM ALGUM LUGAR QUANDO MONTAMOS O NO.
 TypeTabelaSimbolosPilha tabela_Simbolos;
 type_infos_tabela_simbolos *nova_Entrada;
+char *rotuloAtual;
+pilha_rotulo pilhaRotulo;
 
 %}
 
 %token PROGRAM ABRE_PARENTESES FECHA_PARENTESES
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
-%token NUMERO INTEGER
+%token NUMERO INTEGER PROCEDURE
 
 %%
 /* regra 1 */
@@ -48,6 +47,21 @@ nada: ;
 bloco       :
               parte_declara_vars
               {
+               // momento em que é feita a parte do desvio
+               // cria um novo rotulo
+               char rotuloPrint[100];
+               rotuloAtual = pega_rotulo_atual(&pilhaRotulo);
+               sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
+               geraCodigo(NULL, rotuloPrint);
+              }
+              parte_declara_sub_rotinas
+              {
+               // momento que é feito a volta do desvio
+               char rotuloPrint[100];
+               rotuloAtual = pega_rotulo_atual(&pilhaRotulo);
+               sprintf(rotuloPrint, "%s", rotuloAtual);
+               geraCodigo(rotuloPrint, "NADA");
+
               }
 
 
@@ -68,6 +82,34 @@ var         : { } VAR declara_vars
 declara_vars: declara_vars declara_var
             | declara_var
 ;
+
+/* regra 11 */
+/* pode ter mais de uma subrotila */
+parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_sub_rotina | regra_sub_rotina ;
+
+regra_sub_rotina:  declara_procedimento  | nada;
+
+/* regra 12 */
+declara_procedimento: PROCEDURE IDENT {
+   // faz alguma coisa aqui, pensar
+} parametros_formais_ou_nada PONTO_E_VIRGULA bloco;
+
+parametros_formais_ou_nada: parametros_formais | nada;
+
+/* regra 14 */
+parametros_formais: ABRE_PARENTESES parametros_formais PONTO_E_VIRGULA secao_parametros_formais | secao_parametros_formais;
+
+/* regra 15 */
+/* <seção de parâmetros formais> =::
+[var] <lista de identificadores>: <identificador>
+*/
+secao_parametros_formais: var_ou_nada lista_idents DOIS_PONTOS tipo;
+
+var_ou_nada: VAR | nada;
+
+/* complementar */
+/* declara_funcao: nada; */
+
 
 /* regra 9 */
 declara_var : {
@@ -162,6 +204,7 @@ int main (int argc, char** argv) {
 
    yyin=fp;
    yyparse();
+   cria_pilha_rotulo(&pilhaRotulo);
 
    return 0;
 }

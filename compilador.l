@@ -119,6 +119,11 @@ end { simbolo = simb_end;
           return IDENT;
         }
 
+procedure { simbolo = simb_procedimento;
+            strncpy (token, yytext, TAM_TOKEN);
+            IMPRIME("procedure");
+            return PROCEDURE;
+}
 
 %%
 

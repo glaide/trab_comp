@@ -18,3 +18,33 @@ char *cria_rotulo(int rotulo_atual)
     sprintf(rotulo, "R%02d", rotulo_atual);
     return rotulo;
 }
+
+char *pega_rotulo_atual(pilha_rotulo *pilha)
+{
+    //    verifica se ha rotulos
+    if (pilha->tamanho == 0)
+    {
+        printf("Nao ha rotulos na pilha\n");
+        return NULL;
+    }
+
+    // cria um novo rotulo
+    tipo_rotulo *rotulo = malloc(sizeof(tipo_rotulo));
+    rotulo->nome_rotulo = cria_rotulo(pilha->tamanho);
+    rotulo->prox = NULL;
+
+    //   aumenta o tamanho da pilha
+    pilha->tamanho++;
+
+    if (pilha->tamanho == 1)
+    {
+        pilha->topo = rotulo;
+    }
+    else
+    {
+        rotulo->prox = pilha->topo;
+        pilha->topo = rotulo;
+    }
+
+    return rotulo->nome_rotulo;
+}
