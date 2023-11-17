@@ -119,11 +119,23 @@ end { simbolo = simb_end;
           return IDENT;
         }
 
-procedure { simbolo = simb_procedimento;
-            strncpy (token, yytext, TAM_TOKEN);
-            IMPRIME("procedure");
-            return PROCEDURE;
+while { simbolo = simb_while;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("while");
+        return WHILE;
 }
 
+do { simbolo = simb_do;
+       strncpy (token, yytext, TAM_TOKEN);
+       IMPRIME("do");
+       return DO;
+}
 %%
+// procedure { simbolo = simb_procedimento;
+//            strncpy (token, yytext, TAM_TOKEN);
+//            IMPRIME("procedure");
+//            return PROCEDURE;
+//}
+//%%
+
 

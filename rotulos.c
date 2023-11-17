@@ -48,3 +48,18 @@ char *pega_rotulo_atual(pilha_rotulo *pilha)
 
     return rotulo->nome_rotulo;
 }
+
+char *pega_Rotulo(pilha_rotulo *pilha, int n){
+    if(pilha->tamanho == 0){
+        printf("Pilha de Rotulos vazia!");
+        exit(1);
+    }
+    tipo_rotulo *aux = pilha->topo;
+	if (!n){ 
+        n++;
+    }
+	while (--n){
+		aux = aux->prox;
+    }
+    return aux->nome_rotulo;
+}

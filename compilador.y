@@ -13,6 +13,7 @@
 #include "tabelaSimbolos.h"
 
 int num_vars, novasVariaveis, deslocamento, nivel_lexico;
+int num_Rotulos;
 TypeTabelaSimbolosPilha tabela_Simbolos;
 type_infos_tabela_simbolos *nova_Entrada;
 char *rotuloAtual;
@@ -23,7 +24,7 @@ pilha_rotulo pilhaRotulo;
 %token PROGRAM ABRE_PARENTESES FECHA_PARENTESES
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
-%token NUMERO INTEGER PROCEDURE
+%token NUMERO INTEGER PROCEDURE WHILE DO
 
 %%
 /* regra 1 */
@@ -179,6 +180,27 @@ numero: NUMERO {
 		geraCodigo(NULL, totalVars);
 }
 
+comando_while: WHILE {
+   //Cria rotulos do inicio e fim do While e adiciona eles na pilha de rotulos
+      char *ROTwhile_ini = cria_rotulo(num_Rotulos);
+      num_Rotulos++;
+      char *ROTwhile_fim = cria_rotulo(num_Rotulos);
+      num_Rotulos++;
+
+      push_tabela_rotulos(pilhaRotulo, ROTwhile_ini);
+      push_tabela_rotulos(pilhaRotulo, ROTwhile_fim);
+
+      geraCodigo(getRotulo(&pilhaRotulo, 2), "NADA"); 
+   }
+   DO{
+      char dsvf[100];
+		sprintf(dsvf, "DSVF %s", getRotulo(&pilhaRotulo, 1));
+		geraCodigo(NULL, dsvf)
+   }   
+
+//nao fiz o if ainda pq nao entendi direito como tem as expressões, pelo que vi no Jubiladore 
+//tem que fazer uma arvore de expressão algo do genero. 
+//PS: Estou na aula nao vou conseguir mexer agora 
 
 %%
 

@@ -26,5 +26,6 @@ void pop_pilha_rotulo(pilha_rotulo *tabelaRot, int tamanho_pilha);
 /*Cria rotulo, recebe o numero em que esta o rotulo atual e cria ele*/
 char *cria_rotulo(int rotulo_atual);
 char *pega_rotulo_atual(pilha_rotulo *pilha);
+char *pega_Rotulo(pilha_rotulo *pilha, int n);
 
 #endif
