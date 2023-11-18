@@ -6,10 +6,17 @@ void cria_pilha_rotulo(pilha_rotulo *pilha_rotulo)
     pilha_rotulo->topo = NULL; // Inicializa o vetor de ponteiros como NULL (sem elementos ainda)
 }
 
-void push_tabela_rotulos(pilha_rotulo *pilha, tipo_rotulo *rotulo)
+void push_tabela_rotulos(pilha_rotulo *pilha, char *rotulo)
 {
-    rotulo->prox = pilha->topo;
-    pilha->topo = rotulo;
+
+    // cria um novo rotulo
+    tipo_rotulo *novo_rotulo = (tipo_rotulo *)malloc(sizeof(tipo_rotulo));
+    novo_rotulo->nome_rotulo = (char *)malloc(strlen(rotulo) * sizeof(char));
+    strcpy(novo_rotulo->nome_rotulo, rotulo);
+    // insere o novo rotulo no topo da pilha
+    novo_rotulo->prox = pilha->topo;
+    pilha->topo = novo_rotulo;
+    // incrementa o tamanho da pilha
     pilha->tamanho++;
 }
 char *cria_rotulo(int rotulo_atual)
@@ -19,47 +26,21 @@ char *cria_rotulo(int rotulo_atual)
     return rotulo;
 }
 
-char *pega_rotulo_atual(pilha_rotulo *pilha)
+char *pega_Rotulo(pilha_rotulo *pilha, int n)
 {
-    //    verifica se ha rotulos
     if (pilha->tamanho == 0)
     {
-        printf("Nao ha rotulos na pilha\n");
-        return NULL;
-    }
-
-    // cria um novo rotulo
-    tipo_rotulo *rotulo = malloc(sizeof(tipo_rotulo));
-    rotulo->nome_rotulo = cria_rotulo(pilha->tamanho);
-    rotulo->prox = NULL;
-
-    //   aumenta o tamanho da pilha
-    pilha->tamanho++;
-
-    if (pilha->tamanho == 1)
-    {
-        pilha->topo = rotulo;
-    }
-    else
-    {
-        rotulo->prox = pilha->topo;
-        pilha->topo = rotulo;
-    }
-
-    return rotulo->nome_rotulo;
-}
-
-char *pega_Rotulo(pilha_rotulo *pilha, int n){
-    if(pilha->tamanho == 0){
         printf("Pilha de Rotulos vazia!");
         exit(1);
     }
     tipo_rotulo *aux = pilha->topo;
-	if (!n){ 
+    if (!n)
+    {
         n++;
     }
-	while (--n){
-		aux = aux->prox;
+    while (--n)
+    {
+        aux = aux->prox;
     }
     return aux->nome_rotulo;
 }
