@@ -65,7 +65,15 @@ extern int yydebug;
     INTEGER = 271,
     PROCEDURE = 272,
     WHILE = 273,
-    DO = 274
+    DO = 274,
+    IGUAL = 275,
+    DIFERENTE = 276,
+    MENOR = 277,
+    MENOR_IGUAL = 278,
+    MAIOR_IGUAL = 279,
+    MAIOR = 280,
+    SOMA = 281,
+    SUBTRACAO = 282
   };
 #endif
 

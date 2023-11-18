@@ -11,6 +11,7 @@
 #include "compilador.h"
 #include "rotulos.h"
 #include "tabelaSimbolos.h"
+#include "tipoPascal.h"
 
 int num_vars, novasVariaveis, deslocamento, nivel_lexico;
 int num_Rotulos;
@@ -18,6 +19,9 @@ TypeTabelaSimbolosPilha tabela_Simbolos;
 type_infos_tabela_simbolos *nova_Entrada;
 char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
+pilha_Tipo tabelaTipo;
+
+char sinal_da_comparacao[10];
 
 %}
 
@@ -223,14 +227,27 @@ relacao_expressao_simples: relacao expressao_simples | nada;
 
 /* regra 26 */
 relacao:
-	IGUAL {
+	IGUAL{
       // TODO: implementar
+      strcpy(sinal_da_comparacao,"CMIG");
+   }
+	| DIFERENTE {
+      strcpy(sinal_da_comparacao,"CMDG");
+     }
+	| MENOR {  
+      strcpy(sinal_da_comparacao,"CMME");
+   }
+	| MENOR_IGUAL { 
+      strcpy(sinal_da_comparacao,"CMEG");
+
+   }
+	| MAIOR_IGUAL { 
+      strcpy(sinal_da_comparacao,"CMAG");
+
+   }
+	| MAIOR { 
+      strcpy(sinal_da_comparacao,"CMMA");
     }
-	| DIFERENTE {  }
-	| MENOR {  }
-	| MENOR_IGUAL {  }
-	| MAIOR_IGUAL {  }
-	| MAIOR {  }
 ;
 
 /* regra 27 */

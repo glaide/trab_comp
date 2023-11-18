@@ -148,7 +148,15 @@ extern int yydebug;
     INTEGER = 271,
     PROCEDURE = 272,
     WHILE = 273,
-    DO = 274
+    DO = 274,
+    IGUAL = 275,
+    DIFERENTE = 276,
+    MENOR = 277,
+    MENOR_IGUAL = 278,
+    MAIOR_IGUAL = 279,
+    MAIOR = 280,
+    SOMA = 281,
+    SUBTRACAO = 282
   };
 #endif
 
@@ -473,7 +481,7 @@ union yyalloc
 #define YYLAST   63
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  20
+#define YYNTOKENS  28
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  32
 /* YYNRULES -- Number of rules.  */
@@ -482,7 +490,7 @@ union yyalloc
 #define YYNSTATES  74
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   274
+#define YYMAXUTOK   282
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -521,18 +529,19 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    31,    31,    31,    41,    42,    44,    46,    50,    59,
-      49,    75,    79,    79,    80,    83,    84,    89,    89,    91,
-      91,    94,    94,    98,    98,   101,   101,   107,   109,   109,
-     116,   121,   116,   131,   136,   147,   158,   160,   164,   166,
-     167,   171,   174,   174,   176
+       0,    33,    33,    33,    43,    44,    46,    48,    52,    61,
+      51,    77,    82,    82,    83,    86,    87,    92,    92,    94,
+      94,    97,    97,   101,   101,   104,   104,   110,   112,   112,
+     120,   125,   120,   135,   140,   151,   162,   164,   168,   170,
+     171,   175,   178,   178,   191
 };
 #endif
 
@@ -544,8 +553,9 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "PROGRAM", "ABRE_PARENTESES",
   "FECHA_PARENTESES", "VIRGULA", "PONTO_E_VIRGULA", "DOIS_PONTOS", "PONTO",
   "T_BEGIN", "T_END", "VAR", "IDENT", "ATRIBUICAO", "NUMERO", "INTEGER",
-  "PROCEDURE", "WHILE", "DO", "$accept", "programa", "$@1",
-  "parametros_ou_nada", "parametros", "nada", "bloco", "$@2", "$@3",
+  "PROCEDURE", "WHILE", "DO", "IGUAL", "DIFERENTE", "MENOR", "MENOR_IGUAL",
+  "MAIOR_IGUAL", "MAIOR", "SOMA", "SUBTRACAO", "$accept", "programa",
+  "$@1", "parametros_ou_nada", "parametros", "nada", "bloco", "$@2", "$@3",
   "parte_declara_vars", "var", "$@4", "declara_vars",
   "parte_declara_sub_rotinas", "regra_sub_rotina", "declara_procedimento",
   "$@5", "parametros_formais_ou_nada", "parametros_formais",
@@ -561,7 +571,8 @@ static const char *const yytname[] =
 static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282
 };
 # endif
 
@@ -651,24 +662,24 @@ static const yytype_int8 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    21,    22,     0,     3,    13,     4,    23,    24,    25,
-      13,    46,     7,     5,     6,    26,    29,    30,    31,    41,
-      42,    13,     9,    27,    12,    13,    45,    17,    25,    33,
-      34,    35,    32,    41,     6,     8,    13,    28,    34,    41,
-      13,    16,    44,    36,    10,    47,    43,     4,    12,    25,
-      37,    38,    39,    40,    15,    25,    48,    49,    50,    51,
-       7,    25,    38,     7,    46,     7,    11,     8,     7,    26,
-       8,    49,    39,    44
+       0,    29,    30,     0,     3,    13,     4,    31,    32,    33,
+      13,    54,     7,     5,     6,    34,    37,    38,    39,    49,
+      50,    13,     9,    35,    12,    13,    53,    17,    33,    41,
+      42,    43,    40,    49,     6,     8,    13,    36,    42,    49,
+      13,    16,    52,    44,    10,    55,    51,     4,    12,    33,
+      45,    46,    47,    48,    15,    33,    56,    57,    58,    59,
+       7,    33,    46,     7,    54,     7,    11,     8,     7,    34,
+       8,    57,    47,    52
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    20,    22,    21,    23,    23,    24,    25,    27,    28,
-      26,    29,    31,    30,    30,    32,    32,    33,    33,    34,
-      34,    36,    35,    37,    37,    38,    38,    39,    40,    40,
-      42,    43,    41,    44,    45,    45,    46,    46,    47,    48,
-      48,    49,    50,    50,    51
+       0,    28,    30,    29,    31,    31,    32,    33,    35,    36,
+      34,    37,    39,    38,    38,    40,    40,    41,    41,    42,
+      42,    44,    43,    45,    45,    46,    46,    47,    48,    48,
+      50,    51,    49,    52,    53,    53,    54,    54,    55,    56,
+      56,    57,    58,    58,    59
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1374,24 +1385,24 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 31 "compilador.y"
+#line 33 "compilador.y"
              {
              geraCodigo (NULL, "INPP");
              }
-#line 1382 "compilador.tab.c"
+#line 1393 "compilador.tab.c"
     break;
 
   case 3:
-#line 35 "compilador.y"
+#line 37 "compilador.y"
                          {
          imprime_tabela_simbolos(&tabela_Simbolos);
              geraCodigo (NULL, "PARA");
              }
-#line 1391 "compilador.tab.c"
+#line 1402 "compilador.tab.c"
     break;
 
   case 8:
-#line 50 "compilador.y"
+#line 52 "compilador.y"
               {
                // momento em que é feita a parte do desvio
                // cria um novo rotulo
@@ -1400,11 +1411,11 @@ yyreduce:
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
               }
-#line 1404 "compilador.tab.c"
+#line 1415 "compilador.tab.c"
     break;
 
   case 9:
-#line 59 "compilador.y"
+#line 61 "compilador.y"
               {
                // momento que é feito a volta do desvio
                char rotuloPrint[100];
@@ -1413,51 +1424,51 @@ yyreduce:
                geraCodigo(rotuloPrint, "NADA");
 
               }
-#line 1417 "compilador.tab.c"
+#line 1428 "compilador.tab.c"
     break;
 
   case 12:
-#line 79 "compilador.y"
+#line 82 "compilador.y"
               { }
-#line 1423 "compilador.tab.c"
+#line 1434 "compilador.tab.c"
     break;
 
   case 21:
-#line 94 "compilador.y"
+#line 97 "compilador.y"
                                       {
    // faz alguma coisa aqui, pensar
 }
-#line 1431 "compilador.tab.c"
+#line 1442 "compilador.tab.c"
     break;
 
   case 30:
-#line 116 "compilador.y"
+#line 120 "compilador.y"
               {
    novasVariaveis= 0;
 }
-#line 1439 "compilador.tab.c"
+#line 1450 "compilador.tab.c"
     break;
 
   case 31:
-#line 121 "compilador.y"
+#line 125 "compilador.y"
               { /* AMEM */
                // atualiza quantas variaveis tem
                num_vars+=novasVariaveis;
                printf("num de variaveis %d\n", num_vars);
                //para usar amem tem que saber qual deslocamento
-
+               //TODO: implementar
               }
-#line 1451 "compilador.tab.c"
+#line 1462 "compilador.tab.c"
     break;
 
   case 33:
-#line 131 "compilador.y"
+#line 135 "compilador.y"
                       {}
-#line 1457 "compilador.tab.c"
+#line 1468 "compilador.tab.c"
     break;
 
   case 34:
-#line 137 "compilador.y"
+#line 141 "compilador.y"
               { /* insere ultima vars na tabela de s�mbolos */
                 novasVariaveis++;
                 deslocamento++;
@@ -1468,11 +1479,11 @@ yyreduce:
 
                //  no futuro setar o valor de deslocamento tb
                 }
-#line 1472 "compilador.tab.c"
+#line 1483 "compilador.tab.c"
     break;
 
   case 35:
-#line 147 "compilador.y"
+#line 151 "compilador.y"
                     { /* insere vars na tabela de s�mbolos */
               novasVariaveis++;
                 deslocamento++;
@@ -1482,22 +1493,22 @@ yyreduce:
 
                //  no futuro setar o valor de deslocamento tb
                }
-#line 1486 "compilador.tab.c"
+#line 1497 "compilador.tab.c"
     break;
 
   case 44:
-#line 176 "compilador.y"
+#line 191 "compilador.y"
                {
-	// add na tabela de tipos
+	//TODO: add na tabela de tipos
 	    char totalVars[100];
 		sprintf(totalVars, "CRCT %s", token);
 		geraCodigo(NULL, totalVars);
 }
-#line 1497 "compilador.tab.c"
+#line 1508 "compilador.tab.c"
     break;
 
 
-#line 1501 "compilador.tab.c"
+#line 1512 "compilador.tab.c"
 
       default: break;
     }
@@ -1729,7 +1740,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 202 "compilador.y"
+#line 247 "compilador.y"
 
 
 int main (int argc, char** argv) {
