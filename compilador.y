@@ -25,6 +25,8 @@ pilha_rotulo pilhaRotulo;
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
 %token NUMERO INTEGER PROCEDURE WHILE DO
+%token IGUAL DIFERENTE MENOR MENOR_IGUAL MAIOR_IGUAL MAIOR
+%token SOMA SUBTRACAO
 
 %%
 /* regra 1 */
@@ -72,7 +74,8 @@ bloco       :
 
 
 /* regra 8 */
-parte_declara_vars:  var
+parte_declara_vars:  var //TODO: implementar
+
 ;
 
 
@@ -88,7 +91,7 @@ declara_vars: declara_vars declara_var
 /* pode ter mais de uma subrotila */
 parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_sub_rotina | regra_sub_rotina ;
 
-regra_sub_rotina:  declara_procedimento  | nada;
+regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
 
 /* regra 12 */
 declara_procedimento: PROCEDURE IDENT {
@@ -109,6 +112,7 @@ secao_parametros_formais: var_ou_nada lista_idents DOIS_PONTOS tipo;
 var_ou_nada: VAR | nada;
 
 /* complementar */
+/* TODO: implementar */
 /* declara_funcao: nada; */
 
 
@@ -123,12 +127,12 @@ declara_var : {
                num_vars+=novasVariaveis;
                printf("num de variaveis %d\n", num_vars);
                //para usar amem tem que saber qual deslocamento
-
+               //TODO: implementar
               }
               PONTO_E_VIRGULA
 ;
 
-tipo        : INTEGER {}
+tipo        : INTEGER {} //TODO: implementar
 /* TODO: colocar o tipo que será salvo na tabela de simbolos */
 ;
 
@@ -168,18 +172,31 @@ comandos:
 ;
 
 /* regra 17 */
-comando: numero_ou_nada;
+comando: numero_ou_nada; //TODO: implementar
 
-
+/* regra 32 */
 numero_ou_nada: numero DOIS_PONTOS | nada;
 
+/* regra 18 */
+comando_sem_rotulo: comando_atribuicao
+                  /* | comando_chama_procedimento */
+                  | comando_composto
+                  /* | comando_if */
+                  | comando_while
+                  | nada;
+
+/* regra 19 */
+comando_atribuicao:
+
 numero: NUMERO {
-	// add na tabela de tipos
+	//TODO: add na tabela de tipos
 	    char totalVars[100];
 		sprintf(totalVars, "CRCT %s", token);
 		geraCodigo(NULL, totalVars);
 }
 
+
+/* regra 23 */
 comando_while: WHILE {
    //Cria rotulos do inicio e fim do While e adiciona eles na pilha de rotulos
       char *ROTwhile_ini = cria_rotulo(num_Rotulos);
@@ -190,17 +207,42 @@ comando_while: WHILE {
       push_tabela_rotulos(pilhaRotulo, ROTwhile_ini);
       push_tabela_rotulos(pilhaRotulo, ROTwhile_fim);
 
-      geraCodigo(getRotulo(&pilhaRotulo, 2), "NADA"); 
-   }
+      geraCodigo(getRotulo(&pilhaRotulo, 2), "NADA");
+   } expressao {}
    DO{
       char dsvf[100];
 		sprintf(dsvf, "DSVF %s", getRotulo(&pilhaRotulo, 1));
 		geraCodigo(NULL, dsvf)
-   }   
+   }
 
-//nao fiz o if ainda pq nao entendi direito como tem as expressões, pelo que vi no Jubiladore 
-//tem que fazer uma arvore de expressão algo do genero. 
-//PS: Estou na aula nao vou conseguir mexer agora 
+/* regra 25 */
+expressao: expressao_simples relacao_expressao_simples;
+
+
+relacao_expressao_simples: relacao expressao_simples | nada;
+
+/* regra 26 */
+relacao:
+	IGUAL {
+      // TODO: implementar
+    }
+	| DIFERENTE {  }
+	| MENOR {  }
+	| MENOR_IGUAL {  }
+	| MAIOR_IGUAL {  }
+	| MAIOR {  }
+;
+
+/* regra 27 */
+expressao_simples: mais_ou_menos termo expressao_mais_menos_termo;
+
+mais_ou_menos: SOMA| SUBTRACAO ;
+
+/* regra 28 */
+/* <fator> {(*|div|and) <fator> } */
+termo: nada; //TODO: implementar
+
+expressao_mais_menos_termo: nada; //TODO: implementarrt5;p4 c
 
 %%
 
