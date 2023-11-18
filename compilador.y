@@ -11,10 +11,10 @@
 #include "compilador.h"
 #include "rotulos.h"
 #include "tabelaSimbolos.h"
-#include "tipoPascal.h"
+
 
 int num_vars, novasVariaveis, deslocamento, nivel_lexico;
-int num_Rotulos;
+int num_Rotulos=0;
 TypeTabelaSimbolosPilha tabela_simbolos;
 type_infos_tabela_simbolos *nova_entrada, *procedimento_atual;
 char *rotuloAtual;
@@ -36,6 +36,9 @@ char sinal_da_comparacao[10];
 /* regra 1 */
 programa    :{ //TODO: rever todo esse bloco
              geraCodigo (NULL, "INPP");
+             char * RotInicioSubrotina = cria_rotulo(num_Rotulos);
+						 num_Rotulos++;
+						 push_tabela_rotulos(&pilhaRotulo, RotInicioSubrotina);
              }
              PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA
              bloco PONTO {
@@ -44,8 +47,12 @@ programa    :{ //TODO: rever todo esse bloco
              }
 ;
 
-parametros_ou_nada: parametros
-                  | nada;
+parametros_ou_nada: parametros {
+   printf("parametros\n");
+}
+                  | nada {
+                     printf("nada\n");
+                  };
 
 parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES;
 
@@ -78,12 +85,17 @@ bloco       : //TODO: rever todo esse bloco
 
 
 /* regra 8 */
-parte_declara_vars:  var //TODO: implementar
+parte_declara_vars:  var {
+      char amem[100];
+		sprintf(amem, "AMEM %d", num_vars);
+		atualizaNumeroVariaveis(&tabela_simbolos, num_vars, nivel_lexico);
+		geraCodigo(NULL, amem);
+}
 
 ;
 
 
-var         : { } VAR declara_vars
+var         :  VAR declara_vars
             | declara_var
 ;
 
@@ -157,7 +169,10 @@ declara_var : {
               PONTO_E_VIRGULA
 ;
 
-tipo        : INTEGER {} //TODO: implementar
+tipo        : INTEGER {
+   printf("tipo integer\n");
+   setaTipo(&tabela_simbolos, integer, novasVariaveis);
+} //TODO: implementar
 /* TODO: colocar o tipo que será salvo na tabela de simbolos */
 ;
 
@@ -179,6 +194,8 @@ lista_id_var: lista_id_var VIRGULA IDENT
 
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
+
+               printf("saiu de lista_id_var\n");
 
                //  no futuro setar o valor de deslocamento tb
                }
@@ -255,18 +272,18 @@ relacao:
 	| DIFERENTE {
       strcpy(sinal_da_comparacao,"CMDG");
      }
-	| MENOR {  
+	| MENOR {
       strcpy(sinal_da_comparacao,"CMME");
    }
-	| MENOR_IGUAL { 
+	| MENOR_IGUAL {
       strcpy(sinal_da_comparacao,"CMEG");
 
    }
-	| MAIOR_IGUAL { 
+	| MAIOR_IGUAL {
       strcpy(sinal_da_comparacao,"CMAG");
 
    }
-	| MAIOR { 
+	| MAIOR {
       strcpy(sinal_da_comparacao,"CMMA");
     }
 ;
@@ -306,6 +323,7 @@ int main (int argc, char** argv) {
 
    yyin=fp;
    yyparse();
+   criar_tabela_simbolos(&tabela_simbolos);
    cria_pilha_rotulo(&pilhaRotulo);
 
    return 0;

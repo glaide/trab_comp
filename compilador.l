@@ -130,6 +130,12 @@ do { simbolo = simb_do;
        IMPRIME("do");
        return DO;
 }
+
+integer { simbolo = simb_integer;
+           strncpy (token, yytext, TAM_TOKEN);
+           IMPRIME("integer");
+           return INTEGER;
+}
 %%
 // procedure { simbolo = simb_procedimento;
 //            strncpy (token, yytext, TAM_TOKEN);

@@ -19,18 +19,20 @@ typedef enum type_categoria
     funcao
 } type_categoria;
 
-typedef enum type_pascal
+typedef enum tipo_Pascal
 {
-    inteiro,
-    real,
-    booleano,
-    caractere,
+    integer,
+    boolean,
     desconhecido
-} type_pascal;
-
+} tipo_Pascal;
+typedef struct no_Tipo
+{
+    tipo_Pascal tipo;
+    struct no_Tipo *prox;
+} no_Tipo;
 typedef struct type_param_conhecido
 {
-    type_pascal tipo;
+    tipo_Pascal tipo;
     type_passagem_parametro passagem_parametro;
 } type_param_conhecido; // tipo e passagem de parametro para vetor em caso de procedimento ou funcao
 
@@ -40,7 +42,7 @@ typedef struct type_infos_tabela_simbolos
     // deslocamento = endereco relativo ao nivel lexico
     // qnt_variaveis = quantidade de variaveis declaradas na tabela de simbolos
     char *rotulo, *identificador; // rotulo para chamada de func/proc, identificador para variaveis
-    type_pascal type;             // inteiro, real, booleano, caractere, desconhecido
+    tipo_Pascal type;             // inteiro, real, booleano, caractere, desconhecido
     type_categoria categoria;     // variavel_simples, parametro_formal, procedimento, funcao
     type_param_conhecido *parametros_formais;
     // possiveis outros campos: numero de parametros, numero de procedimentos, numero de funcoes (se necessario)
@@ -71,5 +73,22 @@ type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador,
 //   Virou push_tabela_simbolos
 void push_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
 void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha);
+void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico);
+void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n);
+
+// ---------------------------------------//
+
+typedef struct pilha_Tipo
+{
+    int tamanho;
+    no_Tipo *topo;
+} pilha_Tipo;
+
+void cria_pilha_Tipo(pilha_Tipo *tabela_tipo);
+void push_pilha_Tipo(pilha_Tipo *tabela_tipo, tipo_Pascal tipo);
+void verifica_tipo(pilha_Tipo *tabela_tipo, char *operation);
+char *define_tipo(tipo_Pascal type);
+
+tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo);
 
 #endif

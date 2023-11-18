@@ -11,17 +11,27 @@
  *
  * ------------------------------------------------------------------- */
 
-#define TAM_TOKEN 16
+#define TAM_TOKEN 30
 
-typedef enum simbolos {
-  simb_program, simb_var, simb_begin, simb_end,
-  simb_identificador, simb_numero,
-  simb_ponto, simb_virgula, simb_ponto_e_virgula, simb_dois_pontos,
-  simb_atribuicao, simb_abre_parenteses, simb_fecha_parenteses,simb_while,
+typedef enum simbolos
+{
+  simb_program,
+  simb_var,
+  simb_begin,
+  simb_end,
+  simb_identificador,
+  simb_numero,
+  simb_ponto,
+  simb_virgula,
+  simb_ponto_e_virgula,
+  simb_dois_pontos,
+  simb_atribuicao,
+  simb_abre_parenteses,
+  simb_fecha_parenteses,
+  simb_while,
   simb_do,
+  simb_integer
 } simbolos;
-
-
 
 /* -------------------------------------------------------------------
  * variáveis globais
@@ -33,11 +43,10 @@ extern int nivel_lexico;
 extern int desloc;
 extern int nl;
 
-
 /* -------------------------------------------------------------------
  * prototipos globais
  * ------------------------------------------------------------------- */
 
-void geraCodigo (char*, char*);
+void geraCodigo(char *, char *);
 int yylex();
 void yyerror(const char *s);
