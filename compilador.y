@@ -14,8 +14,8 @@
 
 int num_vars, novasVariaveis, deslocamento, nivel_lexico;
 int num_Rotulos;
-TypeTabelaSimbolosPilha tabela_Simbolos;
-type_infos_tabela_simbolos *nova_Entrada;
+TypeTabelaSimbolosPilha tabela_simbolos;
+type_infos_tabela_simbolos *nova_entrada, *procedimento_atual;
 char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
 
@@ -30,12 +30,12 @@ pilha_rotulo pilhaRotulo;
 
 %%
 /* regra 1 */
-programa    :{
+programa    :{ //TODO: rever todo esse bloco
              geraCodigo (NULL, "INPP");
              }
              PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA
              bloco PONTO {
-         imprime_tabela_simbolos(&tabela_Simbolos);
+         imprime_tabela_simbolos(&tabela_simbolos);
              geraCodigo (NULL, "PARA");
              }
 ;
@@ -47,13 +47,13 @@ parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES;
 
 nada: ;
 /* regra 2 */
-bloco       :
+bloco       : //TODO: rever todo esse bloco
               parte_declara_vars
               {
                // momento em que é feita a parte do desvio
                // cria um novo rotulo
                char rotuloPrint[100];
-               rotuloAtual = pega_rotulo_atual(&pilhaRotulo);
+               rotuloAtual = pega_Rotulo(&pilhaRotulo,0); //TODO: verificar
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
               }
@@ -61,7 +61,7 @@ bloco       :
               {
                // momento que é feito a volta do desvio
                char rotuloPrint[100];
-               rotuloAtual = pega_rotulo_atual(&pilhaRotulo);
+               rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
 
@@ -94,8 +94,29 @@ parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_sub_rotina | regra_su
 regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
 
 /* regra 12 */
-declara_procedimento: PROCEDURE IDENT {
-   // faz alguma coisa aqui, pensar
+declara_procedimento: PROCEDURE IDENT
+{
+//TODO: implementar
+   nivel_lexico++;
+   // cria os rotulos de entrada e saida do procedimento, e add eles na pilha de rotulos
+   char *entraProcedimento = cria_rotulo(num_Rotulos);
+   num_Rotulos++;
+   push_tabela_rotulos(pilhaRotulo, entraProcedimento);
+
+   char *saiProcedimento = cria_rotulo(num_Rotulos);
+   num_Rotulos++;
+   push_tabela_rotulos(pilhaRotulo, saiProcedimento);
+
+   //faz a impressao do mepa
+   char printRotuloEntrada[100];
+   sprintf(printRotuloEntrada, "ENPR %s", nivel_lexico);
+	geraCodigo(pegaRotulo(&tabelaRotulos, 2), printRotuloEntrada);
+   // TODO: criar tipo de variavel para procedimento e add na tabela de simbolos
+   nova_entrada=criaVariavelSimplesProcedimento(token,nivel_lexico, 0, entraProcedimento);
+   push_tabela_simbolos(&tabela_simbolos, nova_entrada);
+
+   procedimento_atual = nova_entrada;
+
 } parametros_formais_ou_nada PONTO_E_VIRGULA bloco;
 
 parametros_formais_ou_nada: parametros_formais | nada;
@@ -143,8 +164,8 @@ lista_id_var: lista_id_var VIRGULA IDENT
                 deslocamento++;
                //  add na tabela de simbolos
 
-               nova_Entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
-               push_tabela_simbolos(&tabela_Simbolos, nova_Entrada);
+               nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
+               push_tabela_simbolos(&tabela_simbolos, nova_entrada);
 
                //  no futuro setar o valor de deslocamento tb
                 }
@@ -152,8 +173,8 @@ lista_id_var: lista_id_var VIRGULA IDENT
               novasVariaveis++;
                 deslocamento++;
 
-               nova_Entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
-               push_tabela_simbolos(&tabela_Simbolos, nova_Entrada);
+               nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
+               push_tabela_simbolos(&tabela_simbolos, nova_entrada);
 
                //  no futuro setar o valor de deslocamento tb
                }

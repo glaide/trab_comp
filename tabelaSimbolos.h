@@ -39,11 +39,12 @@ typedef struct type_infos_tabela_simbolos
     int nivel_lexico, deslocamento, qnt_variaveis; // nivel_lexico = profundidade da tabela de simbolos
     // deslocamento = endereco relativo ao nivel lexico
     // qnt_variaveis = quantidade de variaveis declaradas na tabela de simbolos
-    char *rotulo, *identificador;             // rotulo para chamada de func/proc, identificador para variaveis
-    type_pascal type;                         // inteiro, real, booleano, caractere, desconhecido
-    type_categoria categoria;                 // variavel_simples, parametro_formal, procedimento, funcao
-    type_param_conhecido *parametros_formais; // tamanho do vetor = numero de parametros
+    char *rotulo, *identificador; // rotulo para chamada de func/proc, identificador para variaveis
+    type_pascal type;             // inteiro, real, booleano, caractere, desconhecido
+    type_categoria categoria;     // variavel_simples, parametro_formal, procedimento, funcao
+    type_param_conhecido *parametros_formais;
     // possiveis outros campos: numero de parametros, numero de procedimentos, numero de funcoes (se necessario)
+    int numero_parametros, numero_procedimentos, numero_funcoes;
     struct type_infos_tabela_simbolos *prox; // ponteiro para proximo elemento da tabela de simbolos
 
 } type_infos_tabela_simbolos;
