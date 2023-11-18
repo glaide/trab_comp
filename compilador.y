@@ -101,16 +101,16 @@ declara_procedimento: PROCEDURE IDENT
    // cria os rotulos de entrada e saida do procedimento, e add eles na pilha de rotulos
    char *entraProcedimento = cria_rotulo(num_Rotulos);
    num_Rotulos++;
-   push_tabela_rotulos(pilhaRotulo, entraProcedimento);
+   push_tabela_rotulos(&pilhaRotulo, entraProcedimento);
 
    char *saiProcedimento = cria_rotulo(num_Rotulos);
    num_Rotulos++;
-   push_tabela_rotulos(pilhaRotulo, saiProcedimento);
+   push_tabela_rotulos(&pilhaRotulo, saiProcedimento);
 
    //faz a impressao do mepa
    char printRotuloEntrada[100];
-   sprintf(printRotuloEntrada, "ENPR %s", nivel_lexico);
-	geraCodigo(pegaRotulo(&tabelaRotulos, 2), printRotuloEntrada);
+   sprintf(printRotuloEntrada, "ENPR %d", nivel_lexico);
+	geraCodigo(pega_Rotulo(&pilhaRotulo, 2), printRotuloEntrada);
    // TODO: criar tipo de variavel para procedimento e add na tabela de simbolos
    nova_entrada=criaVariavelSimplesProcedimento(token,nivel_lexico, 0, entraProcedimento);
    push_tabela_simbolos(&tabela_simbolos, nova_entrada);
@@ -226,13 +226,13 @@ comando_while: WHILE {
       num_Rotulos++;
 
       push_tabela_rotulos(pilhaRotulo, ROTwhile_ini);
-      push_tabela_rotulos(pilhaRotulo, ROTwhile_fim);
+      push_tabela_rotulos(pilhaRotulo, ROTwhilze_fim);
 
-      geraCodigo(getRotulo(&pilhaRotulo, 2), "NADA");
+      geraCodigo(pega_Rotulo(&pilhaRotulo, 2), "NADA");
    } expressao {}
    DO{
       char dsvf[100];
-		sprintf(dsvf, "DSVF %s", getRotulo(&pilhaRotulo, 1));
+		sprintf(dsvf, "DSVF %s", pega_Rotulo(&pilhaRotulo, 1));
 		geraCodigo(NULL, dsvf)
    }
 
@@ -263,7 +263,7 @@ mais_ou_menos: SOMA| SUBTRACAO ;
 /* <fator> {(*|div|and) <fator> } */
 termo: nada; //TODO: implementar
 
-expressao_mais_menos_termo: nada; //TODO: implementarrt5;p4 c
+expressao_mais_menos_termo: nada; //TODO: implementar
 
 %%
 

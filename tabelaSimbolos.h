@@ -65,6 +65,7 @@ void *criar_tabela_simbolos(TypeTabelaSimbolosPilha *tabelaSimbolos);
 // funcao para adicionar um novo elemento na tabela de simbolos
 
 type_infos_tabela_simbolos *criaVariavelSimples(char *indentificador, int nivelLexico, int descolocamento);
+type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador, int nivelLexico, int totalParametros, char *rotulo);
 
 // void adicionar_elemento_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
 //   Virou push_tabela_simbolos

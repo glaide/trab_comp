@@ -19,7 +19,7 @@ typedef struct pilha_rotulo
 
 /*Operações padroẽs de pilha*/
 void cria_pilha_rotulo(pilha_rotulo *pilha_rotulo);
-void push_tabela_rotulos(pilha_rotulo *pilha, tipo_rotulo *rotulo);
+void push_tabela_rotulos(pilha_rotulo *pilha, char *rotulo);
 void push_pilha_rotulo(pilha_rotulo *tabelaRot, char *novo_rotulo);
 void pop_pilha_rotulo(pilha_rotulo *tabelaRot, int tamanho_pilha);
 

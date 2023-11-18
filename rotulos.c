@@ -6,10 +6,17 @@ void cria_pilha_rotulo(pilha_rotulo *pilha_rotulo)
     pilha_rotulo->topo = NULL; // Inicializa o vetor de ponteiros como NULL (sem elementos ainda)
 }
 
-void push_tabela_rotulos(pilha_rotulo *pilha, tipo_rotulo *rotulo)
+void push_tabela_rotulos(pilha_rotulo *pilha, char *rotulo)
 {
-    rotulo->prox = pilha->topo;
-    pilha->topo = rotulo;
+
+    // cria um novo rotulo
+    tipo_rotulo *novo_rotulo = (tipo_rotulo *)malloc(sizeof(tipo_rotulo));
+    novo_rotulo->nome_rotulo = (char *)malloc(strlen(rotulo) * sizeof(char));
+    strcpy(novo_rotulo->nome_rotulo, rotulo);
+    // insere o novo rotulo no topo da pilha
+    novo_rotulo->prox = pilha->topo;
+    pilha->topo = novo_rotulo;
+    // incrementa o tamanho da pilha
     pilha->tamanho++;
 }
 char *cria_rotulo(int rotulo_atual)

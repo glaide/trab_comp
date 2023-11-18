@@ -1,7 +1,8 @@
 {
-    "files.associations": {
-        "tabelasimbolos.h": "c",
-        "compilador.tab.h": "c"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
+  "files.associations": {
+    "tabelasimbolos.h": "c",
+    "compilador.tab.h": "c",
+    "rotulos.h": "c"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }
