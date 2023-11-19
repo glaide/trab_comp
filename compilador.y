@@ -17,7 +17,7 @@ int num_vars = 0;
 int novasVariaveis, deslocamento, nivel_lexico;
 int num_Rotulos=0;
 TypeTabelaSimbolosPilha tabela_simbolos;
-type_infos_tabela_simbolos *nova_entrada, *procedimento_atual;
+type_infos_tabela_simbolos *nova_entrada, *procedimento_atual, *destino;
 char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
 pilha_Tipo tabelaTipo;
@@ -49,10 +49,10 @@ programa    :{ //TODO: rever todo esse bloco
 ;
 
 parametros_ou_nada: parametros {
-   printf("parametros\n");
+
 }
                   | nada {
-                     printf("nada\n");
+
                   };
 
 parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES;
@@ -65,7 +65,7 @@ bloco       : //TODO: rever todo esse bloco
                // momento em que é feita a parte do desvio
                // cria um novo rotulo
                char rotuloPrint[100];
-               rotuloAtual = pega_Rotulo(&pilhaRotulo,0); //TODO: verificar
+               rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
 
@@ -73,17 +73,13 @@ bloco       : //TODO: rever todo esse bloco
               parte_declara_sub_rotinas
 
               {
-               // momento que é feito a volta do desvio
-
-
 
                char rotuloPrint[100];
                rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
 
-                  char dmem[1000];
-
+               char dmem[1000];
                sprintf(dmem, "DMEM %d", num_vars);
                geraCodigo(NULL, dmem);
 
@@ -232,7 +228,7 @@ comando: numero_ou_nada; //TODO: implementar
 
 /* regra 32 */
 numero_ou_nada: numero DOIS_PONTOS | nada {
-   printf("nada\n");
+
 } ;
 
 /* regra 18 */
@@ -244,7 +240,19 @@ comando_sem_rotulo: comando_atribuicao
                   | nada;
 
 /* regra 19 */
-comando_atribuicao:
+comando_atribuicao: ATRIBUICAO expressao
+
+{
+		verifica_tipo(&tabelaTipo, "atribuicao");
+		char printARM[100];
+      // verifica o tipo de passagem de parametro
+		if (destino->parametros_formais->passagem_parametro == VALOR)
+			sprintf(printARM, "ARMZ %d, %d", destino->nivel_lexico, destino->deslocamento);
+		else
+			sprintf(printARM, "ARMI %d, %d", destino->nivel_lexico, destino->deslocamento);
+		geraCodigo(NULL, printARM);
+		destino = NULL;
+	};
 
 numero: NUMERO {
 	//TODO: add na tabela de tipos
@@ -305,7 +313,7 @@ relacao:
 ;
 
 /* regra 27 */
-expressao_simples: mais_ou_menos termo expressao_mais_menos_termo;
+expressao_simples: mais_ou_menos expressao_mais_menos_termo;
 
 mais_ou_menos: SOMA| SUBTRACAO ;
 
@@ -313,7 +321,9 @@ mais_ou_menos: SOMA| SUBTRACAO ;
 /* <fator> {(*|div|and) <fator> } */
 termo: nada; //TODO: implementar
 
-expressao_mais_menos_termo: nada; //TODO: implementar
+expressao_mais_menos_termo:expressao_mais_menos_termo lista_e_termo|termo ; //TODO: implementar
+
+lista_e_termo:nada;
 
 %%
 
@@ -341,6 +351,7 @@ int main (int argc, char** argv) {
    yyparse();
    criar_tabela_simbolos(&tabela_simbolos);
    cria_pilha_rotulo(&pilhaRotulo);
+   cria_pilha_Tipo(&tabelaTipo);
 
    return 0;
 }
