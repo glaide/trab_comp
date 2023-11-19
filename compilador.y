@@ -71,9 +71,7 @@ bloco       : //TODO: rever todo esse bloco
 
               }
               parte_declara_sub_rotinas
-              {
-               printf("parte_declara_sub_rotinas\n");
-              }
+
               {
                // momento que é feito a volta do desvio
                char rotuloPrint[100];
@@ -111,7 +109,11 @@ declara_vars: declara_vars declara_var
 
 /* regra 11 */
 /* pode ter mais de uma subrotila */
-parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_sub_rotina | nada;
+parte_declara_sub_rotinas: parte_declara_sub_rotinas {
+
+
+}
+regra_sub_rotina | nada;
 
 regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
 
@@ -211,9 +213,7 @@ lista_idents: lista_idents VIRGULA IDENT
 ;
 
 /* regra 16 */
-comando_composto: T_BEGIN comandos {
-   printf("comando composto\n");
-} T_END
+comando_composto: T_BEGIN  comandos  T_END
 comandos:
 	comandos PONTO_E_VIRGULA comando
 	| comando

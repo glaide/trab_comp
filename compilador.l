@@ -128,7 +128,7 @@ do { simbolo = simb_do;
 
 integer { simbolo = simb_integer;
            strncpy (token, yytext, TAM_TOKEN);
-           IMPRIME(" integer zoado ");
+           IMPRIME(" integer ");
            return INTEGER;
 }
 {numero} { simbolo = simb_numero;
