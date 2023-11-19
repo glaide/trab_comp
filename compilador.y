@@ -70,7 +70,7 @@ bloco       : //TODO: rever todo esse bloco
                geraCodigo(NULL, rotuloPrint);
 
               }
-              /* parte_declara_sub_rotinas */
+              parte_declara_sub_rotinas
               {
                printf("parte_declara_sub_rotinas\n");
               }
@@ -111,7 +111,7 @@ declara_vars: declara_vars declara_var
 
 /* regra 11 */
 /* pode ter mais de uma subrotila */
-parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_sub_rotina | regra_sub_rotina ;
+parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_sub_rotina | nada;
 
 regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
 
