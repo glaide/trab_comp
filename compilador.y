@@ -43,7 +43,7 @@ programa    :{ //TODO: rever todo esse bloco
              }
              PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA
              bloco PONTO {
-         // imprime_tabela_simbolos(&tabela_simbolos);
+
              geraCodigo (NULL, "PARA");
              }
 ;
@@ -74,10 +74,18 @@ bloco       : //TODO: rever todo esse bloco
 
               {
                // momento que é feito a volta do desvio
+
+
+
                char rotuloPrint[100];
                rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
+
+                  char dmem[1000];
+
+               sprintf(dmem, "DMEM %d", num_vars);
+               geraCodigo(NULL, dmem);
 
               }
 

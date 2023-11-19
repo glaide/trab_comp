@@ -567,10 +567,10 @@ static const yytype_int8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    38,    38,    38,    51,    54,    58,    60,    64,    75,
-      63,    91,   102,   103,   106,   107,   112,   112,   116,   118,
-     118,   122,   121,   147,   147,   150,   150,   156,   158,   158,
-     166,   171,   166,   181,   189,   200,   210,   212,   216,   218,
-     219,   223,   226,   226,   241
+      63,    99,   110,   111,   114,   115,   120,   120,   124,   126,
+     126,   130,   129,   155,   155,   158,   158,   164,   166,   166,
+     174,   179,   174,   189,   197,   208,   218,   220,   224,   226,
+     227,   231,   234,   234,   249
 };
 #endif
 
@@ -1197,7 +1197,7 @@ yyreduce:
   case 3: /* programa: $@1 PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA bloco PONTO  */
 #line 45 "compilador.y"
                          {
-         // imprime_tabela_simbolos(&tabela_simbolos);
+
              geraCodigo (NULL, "PARA");
              }
 #line 1204 "compilador.tab.c"
@@ -1237,17 +1237,25 @@ yyreduce:
 #line 75 "compilador.y"
               {
                // momento que é feito a volta do desvio
+
+
+
                char rotuloPrint[100];
                rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
 
+                  char dmem[1000];
+
+               sprintf(dmem, "DMEM %d", num_vars);
+               geraCodigo(NULL, dmem);
+
               }
-#line 1247 "compilador.tab.c"
+#line 1255 "compilador.tab.c"
     break;
 
   case 11: /* parte_declara_vars: var  */
-#line 91 "compilador.y"
+#line 99 "compilador.y"
                          {
       char amem[100];
 		sprintf(amem, "AMEM %d", num_vars);
@@ -1255,20 +1263,20 @@ yyreduce:
 
 		geraCodigo(NULL, amem);
 }
-#line 1259 "compilador.tab.c"
+#line 1267 "compilador.tab.c"
     break;
 
   case 16: /* $@4: %empty  */
-#line 112 "compilador.y"
+#line 120 "compilador.y"
                                                      {
 
 
 }
-#line 1268 "compilador.tab.c"
+#line 1276 "compilador.tab.c"
     break;
 
   case 21: /* $@5: %empty  */
-#line 122 "compilador.y"
+#line 130 "compilador.y"
 {
 
 //TODO: implementar
@@ -1293,19 +1301,19 @@ yyreduce:
    procedimento_atual = nova_entrada;
 
 }
-#line 1297 "compilador.tab.c"
-    break;
-
-  case 30: /* $@6: %empty  */
-#line 166 "compilador.y"
-              {
-   novasVariaveis= 0;
-}
 #line 1305 "compilador.tab.c"
     break;
 
+  case 30: /* $@6: %empty  */
+#line 174 "compilador.y"
+              {
+   novasVariaveis= 0;
+}
+#line 1313 "compilador.tab.c"
+    break;
+
   case 31: /* $@7: %empty  */
-#line 171 "compilador.y"
+#line 179 "compilador.y"
               { /* AMEM */
                // atualiza quantas variaveis tem
                num_vars+=novasVariaveis;
@@ -1313,20 +1321,20 @@ yyreduce:
                //para usar amem tem que saber qual deslocamento
                //TODO: implementar
               }
-#line 1317 "compilador.tab.c"
+#line 1325 "compilador.tab.c"
     break;
 
   case 33: /* tipo: INTEGER  */
-#line 181 "compilador.y"
+#line 189 "compilador.y"
                       {
 
    setaTipo(&tabela_simbolos, integer, novasVariaveis);
 }
-#line 1326 "compilador.tab.c"
+#line 1334 "compilador.tab.c"
     break;
 
   case 34: /* lista_id_var: lista_id_var VIRGULA IDENT  */
-#line 190 "compilador.y"
+#line 198 "compilador.y"
               { /* insere ultima vars na tabela de s�mbolos */
                 novasVariaveis++;
                 deslocamento++;
@@ -1337,11 +1345,11 @@ yyreduce:
 
                //  no futuro setar o valor de deslocamento tb
                 }
-#line 1341 "compilador.tab.c"
+#line 1349 "compilador.tab.c"
     break;
 
   case 35: /* lista_id_var: IDENT  */
-#line 200 "compilador.y"
+#line 208 "compilador.y"
                     { /* insere vars na tabela de s�mbolos */
               novasVariaveis++;
                 deslocamento++;
@@ -1350,30 +1358,30 @@ yyreduce:
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
 
                }
-#line 1354 "compilador.tab.c"
-    break;
-
-  case 43: /* numero_ou_nada: nada  */
-#line 226 "compilador.y"
-                                          {
-   printf("nada\n");
-}
 #line 1362 "compilador.tab.c"
     break;
 
+  case 43: /* numero_ou_nada: nada  */
+#line 234 "compilador.y"
+                                          {
+   printf("nada\n");
+}
+#line 1370 "compilador.tab.c"
+    break;
+
   case 44: /* numero: NUMERO  */
-#line 241 "compilador.y"
+#line 249 "compilador.y"
                {
 	//TODO: add na tabela de tipos
 	    char totalVars[100];
 		sprintf(totalVars, "CRCT %s", token);
 		geraCodigo(NULL, totalVars);
 }
-#line 1373 "compilador.tab.c"
+#line 1381 "compilador.tab.c"
     break;
 
 
-#line 1377 "compilador.tab.c"
+#line 1385 "compilador.tab.c"
 
       default: break;
     }
@@ -1566,7 +1574,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 310 "compilador.y"
+#line 318 "compilador.y"
 
 
 int main (int argc, char** argv) {
