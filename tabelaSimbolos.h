@@ -63,7 +63,7 @@ typedef struct type_tabela_simbolos_pilha
 
 // funcao para criar uma nova tabela de simbolos, fiz VOID pq criamos uma varivael do tipo tabela no comp.y
 // e passamos ela para criar_tabela_simbolo
-void *criar_tabela_simbolos(TypeTabelaSimbolosPilha *tabelaSimbolos);
+void criar_tabela_simbolos(TypeTabelaSimbolosPilha *tabelaSimbolos);
 // funcao para adicionar um novo elemento na tabela de simbolos
 
 type_infos_tabela_simbolos *criaVariavelSimples(char *indentificador, int nivelLexico, int descolocamento);
@@ -73,6 +73,7 @@ type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador,
 //   Virou push_tabela_simbolos
 void push_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
 void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha);
+void imprime_tabela_simbolos_topo(type_infos_tabela_simbolos *aux);
 void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico);
 void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n);
 

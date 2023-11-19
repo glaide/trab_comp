@@ -113,11 +113,6 @@ end { simbolo = simb_end;
           return FECHA_PARENTESES;
  }
 
-{ident} { simbolo = simb_identificador;
-          strncpy (token, yytext, TAM_TOKEN);
-          IMPRIME(" ident  ");
-          return IDENT;
-        }
 
 while { simbolo = simb_while;
         strncpy (token, yytext, TAM_TOKEN);
@@ -133,9 +128,21 @@ do { simbolo = simb_do;
 
 integer { simbolo = simb_integer;
            strncpy (token, yytext, TAM_TOKEN);
-           IMPRIME("integer");
+           IMPRIME(" integer zoado ");
            return INTEGER;
 }
+{numero} { simbolo = simb_numero;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME(" numero  ");
+          return NUMERO;
+          }
+
+{ident} { simbolo = simb_identificador;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME(" ident  ");
+          return IDENT;
+        }
+
 %%
 // procedure { simbolo = simb_procedimento;
 //            strncpy (token, yytext, TAM_TOKEN);

@@ -13,7 +13,8 @@
 #include "tabelaSimbolos.h"
 
 
-int num_vars, novasVariaveis, deslocamento, nivel_lexico;
+int num_vars = 0;
+int novasVariaveis, deslocamento, nivel_lexico;
 int num_Rotulos=0;
 TypeTabelaSimbolosPilha tabela_simbolos;
 type_infos_tabela_simbolos *nova_entrada, *procedimento_atual;
@@ -42,7 +43,7 @@ programa    :{ //TODO: rever todo esse bloco
              }
              PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA
              bloco PONTO {
-         imprime_tabela_simbolos(&tabela_simbolos);
+         // imprime_tabela_simbolos(&tabela_simbolos);
              geraCodigo (NULL, "PARA");
              }
 ;
@@ -67,8 +68,12 @@ bloco       : //TODO: rever todo esse bloco
                rotuloAtual = pega_Rotulo(&pilhaRotulo,0); //TODO: verificar
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
+
               }
-              parte_declara_sub_rotinas
+              /* parte_declara_sub_rotinas */
+              {
+               printf("parte_declara_sub_rotinas\n");
+              }
               {
                // momento que é feito a volta do desvio
                char rotuloPrint[100];
@@ -89,6 +94,7 @@ parte_declara_vars:  var {
       char amem[100];
 		sprintf(amem, "AMEM %d", num_vars);
 		atualizaNumeroVariaveis(&tabela_simbolos, num_vars, nivel_lexico);
+
 		geraCodigo(NULL, amem);
 }
 
@@ -112,6 +118,7 @@ regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
 /* regra 12 */
 declara_procedimento: PROCEDURE IDENT
 {
+
 //TODO: implementar
    nivel_lexico++;
    // cria os rotulos de entrada e saida do procedimento, e add eles na pilha de rotulos
@@ -170,7 +177,7 @@ declara_var : {
 ;
 
 tipo        : INTEGER {
-   printf("tipo integer\n");
+
    setaTipo(&tabela_simbolos, integer, novasVariaveis);
 } //TODO: implementar
 /* TODO: colocar o tipo que será salvo na tabela de simbolos */
@@ -195,9 +202,6 @@ lista_id_var: lista_id_var VIRGULA IDENT
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
 
-               printf("saiu de lista_id_var\n");
-
-               //  no futuro setar o valor de deslocamento tb
                }
 ;
 
@@ -207,7 +211,9 @@ lista_idents: lista_idents VIRGULA IDENT
 ;
 
 /* regra 16 */
-comando_composto: T_BEGIN comandos T_END
+comando_composto: T_BEGIN comandos {
+   printf("comando composto\n");
+} T_END
 comandos:
 	comandos PONTO_E_VIRGULA comando
 	| comando
@@ -217,7 +223,9 @@ comandos:
 comando: numero_ou_nada; //TODO: implementar
 
 /* regra 32 */
-numero_ou_nada: numero DOIS_PONTOS | nada;
+numero_ou_nada: numero DOIS_PONTOS | nada {
+   printf("nada\n");
+} ;
 
 /* regra 18 */
 comando_sem_rotulo: comando_atribuicao
