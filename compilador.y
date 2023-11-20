@@ -73,24 +73,15 @@ bloco       : //TODO: rever todo esse bloco
                rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
-
               }
               parte_declara_sub_rotinas
-
               {
-
                char rotuloPrint[100];
                rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
-
-
-
               }
-
-
-              comando_composto
-              ;
+              comando_composto;
 
 
 
@@ -99,7 +90,6 @@ parte_declara_vars:  var {
       char amem[100];
 		sprintf(amem, "AMEM %d", num_vars);
 		atualizaNumeroVariaveis(&tabela_simbolos, num_vars, nivel_lexico);
-
 		geraCodigo(NULL, amem);
 }
 
@@ -146,7 +136,7 @@ declara_procedimento: PROCEDURE IDENT
    // TODO: criar tipo de variavel para procedimento e add na tabela de simbolos
    nova_entrada=criaVariavelSimplesProcedimento(token,nivel_lexico, 0, entraProcedimento);
    push_tabela_simbolos(&tabela_simbolos, nova_entrada);
-   imprime_tabela_simbolos(&tabela_simbolos);
+
 
    procedimento_atual = nova_entrada;
 
@@ -189,33 +179,27 @@ declara_var : {
 tipo        : INTEGER {
 
    setaTipo(&tabela_simbolos, integer, novasVariaveis);
-} //TODO: implementar
+}
 /* TODO: colocar o tipo que será salvo na tabela de simbolos */
 ;
 
 /* regra 10 conta quantas variaveis tem */
 lista_id_var: lista_id_var VIRGULA IDENT
               { /* insere ultima vars na tabela de s�mbolos */
-                novasVariaveis++;
+               novasVariaveis++;
                //  add na tabela de simbolos
-
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
-               imprime_tabela_simbolos(&tabela_simbolos);
-                deslocamento++;
+               deslocamento++;
 
 
                //  no futuro setar o valor de deslocamento tb
                 }
             | IDENT { /* insere vars na tabela de s�mbolos */
-              novasVariaveis++;
-
+               novasVariaveis++;
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
-               imprime_tabela_simbolos(&tabela_simbolos);
-                deslocamento++;
-
-
+               deslocamento++;
                }
 ;
 
@@ -306,6 +290,7 @@ comando_atribuicao: variavel ATRIBUICAO expressao
 
 variavel: IDENT {
    if (destino == NULL) {
+      printf("entrou no if\n");
          destino = busca_tabela_simbolos(&tabela_simbolos, token);
 
          if (destino == NULL) {
@@ -314,8 +299,10 @@ variavel: IDENT {
          }
 
          push_pilha_Tipo(&tabelaTipo, destino->type);
+			printf("foi no tipo 1\n");
    }
    else {
+      printf("entrou no else\n");
       carregada = busca_tabela_simbolos(&tabela_simbolos, token);
       if (carregada == NULL) {
          printf("Variavel nao declarada: %s\n", token);
@@ -338,15 +325,16 @@ numero: NUMERO {
 /* regra 23 */
 comando_while: WHILE {
    //Cria rotulos do inicio e fim do While e adiciona eles na pilha de rotulos
-      char *ROTwhile_ini = cria_rotulo(num_Rotulos);
+      char *inicio_while = cria_rotulo(num_Rotulos);
       num_Rotulos++;
-      char *ROTwhile_fim = cria_rotulo(num_Rotulos);
+      char *fim_while = cria_rotulo(num_Rotulos);
       num_Rotulos++;
 
-      push_tabela_rotulos(&pilhaRotulo, ROTwhile_ini);
-      push_tabela_rotulos(&pilhaRotulo, ROTwhile_fim);
-
-      geraCodigo(pega_rotulo(&pilhaRotulo, 2), "NADA");
+      push_tabela_rotulos(&pilhaRotulo, inicio_while);
+      push_tabela_rotulos(&pilhaRotulo, fim_while);
+      rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
+      geraCodigo(rotuloAtual, "NADA");
+      printf("foi pra expressao!!!!!!!!!!!!!!\n\n");
    } expressao DO
    {
       char dsvf[100];
@@ -371,7 +359,7 @@ comando_while: WHILE {
 
 /* regra 25 */
 expressao: expressao_simples relacao_expressao_simples {
-   printf("entrou em expressao\n");
+   printf("entrou em expressao222222222\n");
 };
 
 
@@ -404,13 +392,19 @@ relacao:
 ;
 
 /* regra 27 */
-expressao_simples: mais_ou_menos expressao_mais_menos_termo;
+expressao_simples: mais_ou_menos {
+   printf("entrou em expressao_simples\n");
+} expressao_mais_menos_termo;
 
-mais_ou_menos: SOMA | SUBTRACAO | nada  ;
+mais_ou_menos: SOMA | SUBTRACAO | nada {
+   printf("entrou em mais_ou_menos enada\n");
+}  ;
 
 /* regra 28 */
 /* <fator> {(*|div|and) <fator> } */
-termo: termo lista_fator| fator;
+termo: termo lista_fator| fator {
+   printf("entrou em termo\n");
+};
 
 lista_fator:
 	MULTIPLICACAO fator {
@@ -427,7 +421,14 @@ lista_fator:
 		geraCodigo(NULL, "CONJ"); }
 ;
 /* regra 29 */
-fator: numero;
+fator: numero | variavel {
+   char printCRVL[100];
+   printf("entrou em variavel\n");
+   printf("nivel lexico %d\n", carregada->nivel_lexico);
+   printf("deslocamento %d\n", carregada->deslocamento);
+	sprintf(printCRVL, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+
+};
 
 expressao_mais_menos_termo:expressao_mais_menos_termo lista_e_termo | termo ; //TODO: implementar
 
