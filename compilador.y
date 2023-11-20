@@ -30,6 +30,7 @@ char sinal_da_comparacao[10];
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
 %token NUMERO INTEGER PROCEDURE WHILE DO
+%token IF THEN ELSE
 %token IGUAL DIFERENTE MENOR MENOR_IGUAL MAIOR_IGUAL MAIOR
 %token SOMA SUBTRACAO MULTIPLICACAO DIVISAO DIV AND
 %token READ WRITE
@@ -231,7 +232,7 @@ numero_ou_nada: numero {
 comando_sem_rotulo: comando_atribuicao
                   /* | comando_chama_procedimento */
                   | comando_composto
-                  /* | comando_if */
+                  | comando_if 
                   | comando_while
                   | read
                   /* | write */
@@ -356,6 +357,38 @@ comando_while: WHILE {
 		pop_tabela_rotulos(&pilhaRotulo, 2);
    };
 
+
+
+comando_if:
+       if_then cond_else{
+
+       }
+if_then: IF{} expressao{}
+      {
+      char *inicio_If = cria_rotulo(num_Rotulos);
+      num_Rotulos++;
+		char *fim_If = cria_rotulo(num_Rotulos);
+		num_Rotulos++;
+
+		push_tabela_rotulos(&pilhaRotulo, inicio_If);
+		push_tabela_rotulos(&pilhaRotulo, fim_If);
+	
+		char rot[100];
+		sprintf(rot, "DSVF %s", pega_rotulo(&pilhaRotulo, 1));
+		geraCodigo(NULL, rot);
+      
+      }
+       THEN comando_sem_rotulo
+
+cond_else:
+      ELSE{
+         char rot[100];
+		   sprintf(rot, "DSVS %s", pega_rotulo(&pilhaRotulo, 2));
+		   geraCodigo(NULL, rot);
+
+	
+		   geraCodigo(getRotulo(&pilhaRotulo, 1), "NADA");
+      }
 
 /* regra 25 */
 expressao: expressao_simples relacao_expressao_simples {
