@@ -5,6 +5,8 @@ R00: NADA
      CRCT 1
      ARMZ 0, 0
      CRCT 2
+     CRCT 1
+     SOMA
      ARMZ 0, 1
-     DMEM 2
-     PARA
+     LEIT
+     ARMZ 0, 0

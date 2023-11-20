@@ -31,7 +31,8 @@ char sinal_da_comparacao[10];
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
 %token NUMERO INTEGER PROCEDURE WHILE DO
 %token IGUAL DIFERENTE MENOR MENOR_IGUAL MAIOR_IGUAL MAIOR
-%token SOMA SUBTRACAO
+%token SOMA SUBTRACAO MULTIPLICACAO DIVISAO DIV AND
+%token READ WRITE
 
 %%
 /* regra 1 */
@@ -211,7 +212,7 @@ lista_id_var: lista_id_var VIRGULA IDENT
 
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
-               imprime_tabela_simbolos(&tabela_simbolos);``
+               imprime_tabela_simbolos(&tabela_simbolos);
                 deslocamento++;
 
 
@@ -248,8 +249,41 @@ comando_sem_rotulo: comando_atribuicao
                   | comando_composto
                   /* | comando_if */
                   | comando_while
+                  | read
+                  /* | write */
                   | nada;
 
+read: READ ABRE_PARENTESES lista_leitura FECHA_PARENTESES;
+
+lista_leitura:
+   	lista_leitura VIRGULA simbolo_leitura | simbolo_leitura;
+
+simbolo_leitura:
+	IDENT
+	{
+		geraCodigo(NULL, "LEIT");
+		destino = busca_tabela_simbolos(&tabela_simbolos, token);
+		if(destino == NULL) {
+			printf("Variavel nao encontrada.\n");
+			exit(1);
+		}
+
+      char print[1000];
+		sprintf(print, "ARMZ %d, %d", destino->nivel_lexico, destino->deslocamento);
+		geraCodigo(NULL, print);
+		destino = NULL;
+	}
+;
+
+/* write:
+   	WRITE ABRE_PARENTESES lista_escrita FECHA_PARENTESES
+; */
+
+lista_escrita:
+	lista_escrita VIRGULA expressao
+   { geraCodigo (NULL, "IMPR"); }
+	| expressao { geraCodigo (NULL, "IMPR"); }
+;
 /* regra 19 */
 comando_atribuicao: variavel ATRIBUICAO expressao
 {
@@ -271,15 +305,13 @@ comando_atribuicao: variavel ATRIBUICAO expressao
 /* regra 30 */
 
 variavel: IDENT {
-   printf("entrou em variavel\n");
    if (destino == NULL) {
          destino = busca_tabela_simbolos(&tabela_simbolos, token);
-         printf("destino %d\n", destino->deslocamento);
+
          if (destino == NULL) {
             printf("Variavel nao declarada: %s\n", token);
             exit(1);
          }
-			printf("foi no tipo 1\n");
 
          push_pilha_Tipo(&tabelaTipo, destino->type);
    }
@@ -289,8 +321,6 @@ variavel: IDENT {
          printf("Variavel nao declarada: %s\n", token);
          exit(1);
       }
-			printf("foi no tipo 2\n");
-
       push_pilha_Tipo(&tabelaTipo, carregada->type);
    }
 }
@@ -361,30 +391,45 @@ relacao:
 ;
 
 /* regra 27 */
-expressao_simples: mais_ou_menos {
-   		printf("Expressao simples\n");
-		printf("soma ou vazio\n");
-}
-expressao_mais_menos_termo;
+expressao_simples: mais_ou_menos expressao_mais_menos_termo;
 
-mais_ou_menos: SOMA| SUBTRACAO|nada {
-   printf("entrou em mais_ou_menos\n");
-} ;
+mais_ou_menos: SOMA | SUBTRACAO | nada  ;
 
 /* regra 28 */
 /* <fator> {(*|div|and) <fator> } */
-termo: fator; //TODO: implementar
+termo: termo lista_fator| fator;
 
+lista_fator:
+	MULTIPLICACAO fator {
+		verifica_tipo(&tabelaTipo, "multiplicacao");
+		geraCodigo(NULL, "MULT");}
+	| DIVISAO fator {
+		verifica_tipo(&tabelaTipo, "divisao");
+		geraCodigo(NULL, "DIVI"); }
+	| DIV fator {
+		verifica_tipo(&tabelaTipo, "div");
+		geraCodigo(NULL, "DIVI"); }
+	| AND fator {
+		verifica_tipo(&tabelaTipo, "and");
+		geraCodigo(NULL, "CONJ"); }
+;
 /* regra 29 */
 fator: numero;
 
-expressao_mais_menos_termo:termo ; //TODO: implementar
+expressao_mais_menos_termo:expressao_mais_menos_termo lista_e_termo | termo ; //TODO: implementar
 
-lista_e_termo:nada {
-   printf("entrou em lista_e_termo\n");
-   printf("nada\n");
+lista_e_termo:
+	{
+		printf("Lista termo\n");
+	}
+	SOMA termo {
+		verifica_tipo(&tabelaTipo, "soma");
+		geraCodigo(NULL, "SOMA");}
+	| SUBTRACAO termo {
+		verifica_tipo(&tabelaTipo, "subtracao");
+		geraCodigo(NULL, "SUBT");}
 
-};
+;
 
 %%
 

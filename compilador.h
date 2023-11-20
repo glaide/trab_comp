@@ -30,7 +30,15 @@ typedef enum simbolos
   simb_fecha_parenteses,
   simb_while,
   simb_do,
-  simb_integer
+  simb_integer,
+  simb_multiplicacao,
+  simb_divisao,
+  simb_div,
+  simb_and,
+  simb_soma,
+  simb_subtracao,
+  simb_read,
+  simb_write
 } simbolos;
 
 /* -------------------------------------------------------------------
