@@ -113,6 +113,17 @@ end { simbolo = simb_end;
           return FECHA_PARENTESES;
  }
 
+\+ { simbolo = simb_soma;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("soma");
+        return SOMA;
+}
+
+\- { simbolo = simb_subtracao;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("subtracao");
+        return SUBTRACAO;
+}
 
 while { simbolo = simb_while;
         strncpy (token, yytext, TAM_TOKEN);
@@ -128,9 +139,45 @@ do { simbolo = simb_do;
 
 integer { simbolo = simb_integer;
            strncpy (token, yytext, TAM_TOKEN);
-           IMPRIME(" integer zoado ");
+           IMPRIME(" integer ");
            return INTEGER;
 }
+\* { simbolo = simb_multiplicacao;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("multiplicacao ");
+        return MULTIPLICACAO;
+}
+
+\/ { simbolo = simb_divisao;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("divisao");
+        return DIVISAO;
+}
+
+div { simbolo = simb_div;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("div");
+        return DIV;
+}
+
+and { simbolo = simb_and;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("e");
+        return AND;
+}
+
+read { simbolo = simb_read;
+              strncpy (token, yytext, TAM_TOKEN);
+              IMPRIME("read");
+              return READ;
+}
+
+write { simbolo = simb_write;
+              strncpy (token, yytext, TAM_TOKEN);
+              IMPRIME("write");
+              return WRITE;
+}
+
 {numero} { simbolo = simb_numero;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME(" numero  ");

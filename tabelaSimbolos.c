@@ -39,14 +39,14 @@ type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador,
     strcpy(infosVariavel->identificador, identificador);
     infosVariavel->nivel_lexico = nivelLexico;
     infosVariavel->categoria = procedimento;
-    infosVariavel->rotulo = (char *)malloc(strlen(rotulo) * sizeof(char));
-    strcpy(infosVariavel->rotulo, rotulo);
+
     infosVariavel->numero_parametros = totalParametros;
 
     infosVariavel->prox = NULL;
     infosVariavel->numero_funcoes = 0;
     infosVariavel->numero_procedimentos = 0;
-    infosVariavel->parametros_formais = NULL;
+    infosVariavel->rotulo = (char *)malloc(strlen(rotulo) * sizeof(char));
+    strcpy(infosVariavel->rotulo, rotulo);
     infosVariavel->type = desconhecido;
     infosVariavel->deslocamento = 0;
 
@@ -94,6 +94,19 @@ void imprime_tabela_simbolos_topo(type_infos_tabela_simbolos *aux)
     }
 }
 
+type_infos_tabela_simbolos *busca_tabela_simbolos(TypeTabelaSimbolosPilha *tabela_simbolos, char *identificador)
+{
+    type_infos_tabela_simbolos *aux = tabela_simbolos->topo;
+    while (aux != NULL)
+    {
+        if (strcmp(aux->identificador, identificador) == 0)
+        {
+            return aux;
+        }
+        aux = aux->prox;
+    }
+    return NULL;
+}
 void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico)
 {
 
@@ -136,16 +149,20 @@ void cria_pilha_Tipo(pilha_Tipo *tabela_tipo)
 
 void push_pilha_Tipo(pilha_Tipo *tabela_tipo, tipo_Pascal tipo_Pascal)
 {
+    printf("push tipo %d\n", tipo_Pascal);
     no_Tipo *novo = (no_Tipo *)malloc(sizeof(no_Tipo));
     novo->tipo = tipo_Pascal;
 
     novo->prox = tabela_tipo->topo;
     tabela_tipo->topo = novo;
     tabela_tipo->tamanho++;
+    printf("Tamanho atual da pilha: %d\n", tabela_tipo->tamanho);
 }
 
 tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo)
 {
+    printf("Tamanho atual da pilha no pop: %d\n", tabela_tipo->tamanho);
+
     if (tabela_tipo->tamanho == 0)
     {
         printf("Pilha vazia!");
@@ -161,6 +178,7 @@ tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo)
     // atualiza tamanho
     tabela_tipo->tamanho--;
     // retorna tipo do topo antigo
+    printf("saindo do poo\n");
     return type;
 }
 char *define_tipo(tipo_Pascal type)
@@ -182,8 +200,10 @@ void verifica_tipo(pilha_Tipo *tabela_tipo, char *operation)
     tipo_Pascal type2 = pop_pilha_Tipo(tabela_tipo);
     if (type1 == type2)
     {
+
         if (strcmp(operation, "atribuicao") != 0)
         {
+            printf("Variaveis possuem o mesmo tipo.\n");
             if (strcmp(operation, "soma") == 0 || strcmp(operation, "subtracao") == 0 || strcmp(operation, "multiplicacao") == 0 || strcmp(operation, "divisao") == 0 || strcmp(operation, "div") == 0)
                 push_pilha_Tipo(tabela_tipo, integer);
             else

@@ -17,7 +17,7 @@ int num_vars = 0;
 int novasVariaveis, deslocamento, nivel_lexico;
 int num_Rotulos=0;
 TypeTabelaSimbolosPilha tabela_simbolos;
-type_infos_tabela_simbolos *nova_entrada, *procedimento_atual;
+type_infos_tabela_simbolos *nova_entrada, *procedimento_atual, *destino, *carregada;
 char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
 pilha_Tipo tabelaTipo;
@@ -31,7 +31,8 @@ char sinal_da_comparacao[10];
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
 %token NUMERO INTEGER PROCEDURE WHILE DO
 %token IGUAL DIFERENTE MENOR MENOR_IGUAL MAIOR_IGUAL MAIOR
-%token SOMA SUBTRACAO
+%token SOMA SUBTRACAO MULTIPLICACAO DIVISAO DIV AND
+%token READ WRITE
 
 %%
 /* regra 1 */
@@ -43,21 +44,25 @@ programa    :{ //TODO: rever todo esse bloco
              }
              PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA
              bloco PONTO {
-         // imprime_tabela_simbolos(&tabela_simbolos);
-             geraCodigo (NULL, "PARA");
+               char dmem[1000];
+               sprintf(dmem, "DMEM %d", num_vars);
+               geraCodigo(NULL, dmem);
+               geraCodigo (NULL, "PARA");
              }
 ;
 
 parametros_ou_nada: parametros {
-   printf("parametros\n");
+
 }
                   | nada {
-                     printf("nada\n");
+
                   };
 
 parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES;
 
-nada: ;
+nada: {
+   printf("entrou em nada\n");
+};
 /* regra 2 */
 bloco       : //TODO: rever todo esse bloco
               parte_declara_vars
@@ -65,21 +70,21 @@ bloco       : //TODO: rever todo esse bloco
                // momento em que é feita a parte do desvio
                // cria um novo rotulo
                char rotuloPrint[100];
-               rotuloAtual = pega_Rotulo(&pilhaRotulo,0); //TODO: verificar
+               rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
 
               }
               parte_declara_sub_rotinas
+
               {
-               printf("parte_declara_sub_rotinas\n");
-              }
-              {
-               // momento que é feito a volta do desvio
+
                char rotuloPrint[100];
-               rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
+               rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
+
+
 
               }
 
@@ -111,7 +116,11 @@ declara_vars: declara_vars declara_var
 
 /* regra 11 */
 /* pode ter mais de uma subrotila */
-parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_sub_rotina | nada;
+parte_declara_sub_rotinas: parte_declara_sub_rotinas {
+
+
+}
+regra_sub_rotina | nada;
 
 regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
 
@@ -133,10 +142,11 @@ declara_procedimento: PROCEDURE IDENT
    //faz a impressao do mepa
    char printRotuloEntrada[100];
    sprintf(printRotuloEntrada, "ENPR %d", nivel_lexico);
-	geraCodigo(pega_Rotulo(&pilhaRotulo, 2), printRotuloEntrada);
+	geraCodigo(pega_rotulo(&pilhaRotulo, 2), printRotuloEntrada);
    // TODO: criar tipo de variavel para procedimento e add na tabela de simbolos
    nova_entrada=criaVariavelSimplesProcedimento(token,nivel_lexico, 0, entraProcedimento);
    push_tabela_simbolos(&tabela_simbolos, nova_entrada);
+   imprime_tabela_simbolos(&tabela_simbolos);
 
    procedimento_atual = nova_entrada;
 
@@ -187,20 +197,24 @@ tipo        : INTEGER {
 lista_id_var: lista_id_var VIRGULA IDENT
               { /* insere ultima vars na tabela de s�mbolos */
                 novasVariaveis++;
-                deslocamento++;
                //  add na tabela de simbolos
 
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
+               imprime_tabela_simbolos(&tabela_simbolos);
+                deslocamento++;
+
 
                //  no futuro setar o valor de deslocamento tb
                 }
             | IDENT { /* insere vars na tabela de s�mbolos */
               novasVariaveis++;
-                deslocamento++;
 
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
+               imprime_tabela_simbolos(&tabela_simbolos);
+                deslocamento++;
+
 
                }
 ;
@@ -211,20 +225,22 @@ lista_idents: lista_idents VIRGULA IDENT
 ;
 
 /* regra 16 */
-comando_composto: T_BEGIN comandos {
-   printf("comando composto\n");
-} T_END
+comando_composto: T_BEGIN  comandos  T_END
 comandos:
 	comandos PONTO_E_VIRGULA comando
 	| comando
 ;
 
 /* regra 17 */
-comando: numero_ou_nada; //TODO: implementar
+comando: numero_ou_nada{
+   printf("entrou em comando\n");
+} comando_sem_rotulo;
 
 /* regra 32 */
-numero_ou_nada: numero DOIS_PONTOS | nada {
-   printf("nada\n");
+numero_ou_nada: numero {
+   printf("entrou em numero_ou_nada\n");
+} DOIS_PONTOS | nada {
+
 } ;
 
 /* regra 18 */
@@ -233,13 +249,86 @@ comando_sem_rotulo: comando_atribuicao
                   | comando_composto
                   /* | comando_if */
                   | comando_while
+                  | read
+                  /* | write */
                   | nada;
 
-/* regra 19 */
-comando_atribuicao:
+read: READ ABRE_PARENTESES lista_leitura FECHA_PARENTESES;
 
+lista_leitura:
+   	lista_leitura VIRGULA simbolo_leitura | simbolo_leitura;
+
+simbolo_leitura:
+	IDENT
+	{
+		geraCodigo(NULL, "LEIT");
+		destino = busca_tabela_simbolos(&tabela_simbolos, token);
+		if(destino == NULL) {
+			printf("Variavel nao encontrada.\n");
+			exit(1);
+		}
+
+      char print[1000];
+		sprintf(print, "ARMZ %d, %d", destino->nivel_lexico, destino->deslocamento);
+		geraCodigo(NULL, print);
+		destino = NULL;
+	}
+;
+
+/* write:
+   	WRITE ABRE_PARENTESES lista_escrita FECHA_PARENTESES
+; */
+
+lista_escrita:
+	lista_escrita VIRGULA expressao
+   { geraCodigo (NULL, "IMPR"); }
+	| expressao { geraCodigo (NULL, "IMPR"); }
+;
+/* regra 19 */
+comando_atribuicao: variavel ATRIBUICAO expressao
+{
+
+
+		verifica_tipo(&tabelaTipo, "atribuicao");
+		char printARM[100];
+      // verifica o tipo de passagem de parametro
+      printf("passagem de parametro %d\n", destino->passagem_parametro);
+		if (destino->passagem_parametro == VALOR)
+{      printf("saiu do verifica_tipo\n");
+			sprintf(printARM, "ARMZ %d, %d", destino->nivel_lexico, destino->deslocamento);}
+		else
+			sprintf(printARM, "ARMI %d, %d", destino->nivel_lexico, destino->deslocamento);
+		geraCodigo(NULL, printARM);
+		destino = NULL;
+	};
+
+/* regra 30 */
+
+variavel: IDENT {
+   if (destino == NULL) {
+         destino = busca_tabela_simbolos(&tabela_simbolos, token);
+
+         if (destino == NULL) {
+            printf("Variavel nao declarada: %s\n", token);
+            exit(1);
+         }
+
+         push_pilha_Tipo(&tabelaTipo, destino->type);
+   }
+   else {
+      carregada = busca_tabela_simbolos(&tabela_simbolos, token);
+      if (carregada == NULL) {
+         printf("Variavel nao declarada: %s\n", token);
+         exit(1);
+      }
+      push_pilha_Tipo(&tabelaTipo, carregada->type);
+   }
+}
 numero: NUMERO {
 	//TODO: add na tabela de tipos
+   printf("entrou em numero\n");
+		push_pilha_Tipo(&tabelaTipo, integer);
+      printf("saiu de push_pilha_Tipo\n");
 	    char totalVars[100];
 		sprintf(totalVars, "CRCT %s", token);
 		geraCodigo(NULL, totalVars);
@@ -254,58 +343,106 @@ comando_while: WHILE {
       char *ROTwhile_fim = cria_rotulo(num_Rotulos);
       num_Rotulos++;
 
-      push_tabela_rotulos(pilhaRotulo, ROTwhile_ini);
-      push_tabela_rotulos(pilhaRotulo, ROTwhilze_fim);
+      push_tabela_rotulos(&pilhaRotulo, ROTwhile_ini);
+      push_tabela_rotulos(&pilhaRotulo, ROTwhile_fim);
 
-      geraCodigo(pega_Rotulo(&pilhaRotulo, 2), "NADA");
-   } expressao {}
-   DO{
+      geraCodigo(pega_rotulo(&pilhaRotulo, 2), "NADA");
+   } expressao DO
+   {
       char dsvf[100];
-		sprintf(dsvf, "DSVF %s", pega_Rotulo(&pilhaRotulo, 1));
-		geraCodigo(NULL, dsvf)
-   }
+      rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
+		sprintf(dsvf, "DSVF %s", rotuloAtual);
+		geraCodigo(NULL, dsvf);
+   } comando_composto {
+
+      char dsvs[100];
+      rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
+		sprintf(dsvs, "DSVS %s",rotuloAtual);
+		geraCodigo(NULL, dsvs);
+
+		char rot[100];
+      rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
+		sprintf(rot, "%s", rotuloAtual);
+		geraCodigo(rot, "NADA");
+
+		pop_tabela_rotulos(&pilhaRotulo, 2);
+   };
+
 
 /* regra 25 */
-expressao: expressao_simples relacao_expressao_simples;
+expressao: expressao_simples relacao_expressao_simples {
+   printf("entrou em expressao\n");
+};
 
 
-relacao_expressao_simples: relacao expressao_simples | nada;
+relacao_expressao_simples: relacao expressao_simples | nada
+{
+   printf("entrou nesse nada\n");
+};
 
 /* regra 26 */
 relacao:
-	IGUAL{
-      // TODO: implementar
+	IGUAL {
       strcpy(sinal_da_comparacao,"CMIG");
    }
 	| DIFERENTE {
       strcpy(sinal_da_comparacao,"CMDG");
-     }
+   }
 	| MENOR {
       strcpy(sinal_da_comparacao,"CMME");
    }
 	| MENOR_IGUAL {
       strcpy(sinal_da_comparacao,"CMEG");
-
+   }
+   | MAIOR {
+      strcpy(sinal_da_comparacao,"CMMA");
    }
 	| MAIOR_IGUAL {
       strcpy(sinal_da_comparacao,"CMAG");
-
    }
-	| MAIOR {
-      strcpy(sinal_da_comparacao,"CMMA");
-    }
+
 ;
 
 /* regra 27 */
-expressao_simples: mais_ou_menos termo expressao_mais_menos_termo;
+expressao_simples: mais_ou_menos expressao_mais_menos_termo;
 
-mais_ou_menos: SOMA| SUBTRACAO ;
+mais_ou_menos: SOMA | SUBTRACAO | nada  ;
 
 /* regra 28 */
 /* <fator> {(*|div|and) <fator> } */
-termo: nada; //TODO: implementar
+termo: termo lista_fator| fator;
 
-expressao_mais_menos_termo: nada; //TODO: implementar
+lista_fator:
+	MULTIPLICACAO fator {
+		verifica_tipo(&tabelaTipo, "multiplicacao");
+		geraCodigo(NULL, "MULT");}
+	| DIVISAO fator {
+		verifica_tipo(&tabelaTipo, "divisao");
+		geraCodigo(NULL, "DIVI"); }
+	| DIV fator {
+		verifica_tipo(&tabelaTipo, "div");
+		geraCodigo(NULL, "DIVI"); }
+	| AND fator {
+		verifica_tipo(&tabelaTipo, "and");
+		geraCodigo(NULL, "CONJ"); }
+;
+/* regra 29 */
+fator: numero;
+
+expressao_mais_menos_termo:expressao_mais_menos_termo lista_e_termo | termo ; //TODO: implementar
+
+lista_e_termo:
+	{
+		printf("Lista termo\n");
+	}
+	SOMA termo {
+		verifica_tipo(&tabelaTipo, "soma");
+		geraCodigo(NULL, "SOMA");}
+	| SUBTRACAO termo {
+		verifica_tipo(&tabelaTipo, "subtracao");
+		geraCodigo(NULL, "SUBT");}
+
+;
 
 %%
 
@@ -333,6 +470,7 @@ int main (int argc, char** argv) {
    yyparse();
    criar_tabela_simbolos(&tabela_simbolos);
    cria_pilha_rotulo(&pilhaRotulo);
+   cria_pilha_Tipo(&tabelaTipo);
 
    return 0;
 }
