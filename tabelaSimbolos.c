@@ -149,19 +149,19 @@ void cria_pilha_Tipo(pilha_Tipo *tabela_tipo)
 
 void push_pilha_Tipo(pilha_Tipo *tabela_tipo, tipo_Pascal tipo_Pascal)
 {
-    printf("push tipo %d\n", tipo_Pascal);
+
     no_Tipo *novo = (no_Tipo *)malloc(sizeof(no_Tipo));
     novo->tipo = tipo_Pascal;
 
     novo->prox = tabela_tipo->topo;
     tabela_tipo->topo = novo;
     tabela_tipo->tamanho++;
-    printf("Tamanho atual da pilha: %d\n", tabela_tipo->tamanho);
+
 }
 
 tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo)
 {
-    printf("Tamanho atual da pilha no pop: %d\n", tabela_tipo->tamanho);
+
 
     if (tabela_tipo->tamanho == 0)
     {
@@ -178,7 +178,7 @@ tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo)
     // atualiza tamanho
     tabela_tipo->tamanho--;
     // retorna tipo do topo antigo
-    printf("saindo do poo\n");
+
     return type;
 }
 char *define_tipo(tipo_Pascal type)

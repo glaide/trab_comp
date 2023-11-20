@@ -62,7 +62,7 @@ parametros_ou_nada: parametros {
 parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES;
 
 nada: {
-   printf("entrou em nada\n");
+
 };
 /* regra 2 */
 bloco       : //TODO: rever todo esse bloco
@@ -170,7 +170,7 @@ declara_var : {
               { /* AMEM */
                // atualiza quantas variaveis tem
                num_vars+=novasVariaveis;
-               printf("num de variaveis %d\n", num_vars);
+
                //para usar amem tem que saber qual deslocamento
                //TODO: implementar
               }
@@ -218,12 +218,12 @@ comandos:
 
 /* regra 17 */
 comando: numero_ou_nada{
-   printf("entrou em comando\n");
+
 } comando_sem_rotulo;
 
 /* regra 32 */
 numero_ou_nada: numero {
-   printf("entrou em numero_ou_nada\n");
+
 } DOIS_PONTOS | nada {
 
 } ;
@@ -232,7 +232,7 @@ numero_ou_nada: numero {
 comando_sem_rotulo: comando_atribuicao
                   /* | comando_chama_procedimento */
                   | comando_composto
-                  | comando_if 
+                  | comando_if
                   | comando_while
                   | read
                   /* | write */
@@ -279,8 +279,7 @@ comando_atribuicao: variavel ATRIBUICAO expressao
       // verifica o tipo de passagem de parametro
       printf("passagem de parametro %d\n", destino->passagem_parametro);
 		if (destino->passagem_parametro == VALOR)
-{      printf("saiu do verifica_tipo\n");
-			sprintf(printARM, "ARMZ %d, %d", destino->nivel_lexico, destino->deslocamento);}
+			sprintf(printARM, "ARMZ %d, %d", destino->nivel_lexico, destino->deslocamento);
 		else
 			sprintf(printARM, "ARMI %d, %d", destino->nivel_lexico, destino->deslocamento);
 		geraCodigo(NULL, printARM);
@@ -291,7 +290,7 @@ comando_atribuicao: variavel ATRIBUICAO expressao
 
 variavel: IDENT {
    if (destino == NULL) {
-      printf("entrou no if\n");
+
          destino = busca_tabela_simbolos(&tabela_simbolos, token);
 
          if (destino == NULL) {
@@ -300,13 +299,13 @@ variavel: IDENT {
          }
 
          push_pilha_Tipo(&tabelaTipo, destino->type);
-			printf("foi no tipo 1\n");
+
    }
    else {
-      printf("entrou no else\n");
+
       carregada = busca_tabela_simbolos(&tabela_simbolos, token);
       if (carregada == NULL) {
-         printf("Variavel nao declarada: %s\n", token);
+
          exit(1);
       }
       push_pilha_Tipo(&tabelaTipo, carregada->type);
@@ -314,9 +313,9 @@ variavel: IDENT {
 }
 numero: NUMERO {
 	//TODO: add na tabela de tipos
-   printf("entrou em numero\n");
+
 		push_pilha_Tipo(&tabelaTipo, integer);
-      printf("saiu de push_pilha_Tipo\n");
+
 	    char totalVars[100];
 		sprintf(totalVars, "CRCT %s", token);
 		geraCodigo(NULL, totalVars);
@@ -335,7 +334,7 @@ comando_while: WHILE {
       push_tabela_rotulos(&pilhaRotulo, fim_while);
       rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
       geraCodigo(rotuloAtual, "NADA");
-      printf("foi pra expressao!!!!!!!!!!!!!!\n\n");
+
    } expressao DO
    {
       char dsvf[100];
@@ -372,33 +371,34 @@ if_then: IF{} expressao{}
 
 		push_tabela_rotulos(&pilhaRotulo, inicio_If);
 		push_tabela_rotulos(&pilhaRotulo, fim_If);
-	
+
 		char rot[100];
 		sprintf(rot, "DSVF %s", pega_rotulo(&pilhaRotulo, 1));
 		geraCodigo(NULL, rot);
-      
+
       }
        THEN comando_sem_rotulo
 
 cond_else:
       ELSE{
          char rot[100];
-		   sprintf(rot, "DSVS %s", pega_rotulo(&pilhaRotulo, 2));
+         rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
+		   sprintf(rot, "DSVS %s", rotuloAtual);
 		   geraCodigo(NULL, rot);
 
-	
-		   geraCodigo(getRotulo(&pilhaRotulo, 1), "NADA");
+         rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
+		   geraCodigo(rotuloAtual, "NADA");
       }
 
 /* regra 25 */
 expressao: expressao_simples relacao_expressao_simples {
-   printf("entrou em expressao222222222\n");
+
 };
 
 
 relacao_expressao_simples: relacao expressao_simples | nada
 {
-   printf("entrou nesse nada\n");
+
 };
 
 /* regra 26 */
@@ -426,17 +426,17 @@ relacao:
 
 /* regra 27 */
 expressao_simples: mais_ou_menos {
-   printf("entrou em expressao_simples\n");
+
 } expressao_mais_menos_termo;
 
 mais_ou_menos: SOMA | SUBTRACAO | nada {
-   printf("entrou em mais_ou_menos enada\n");
+
 }  ;
 
 /* regra 28 */
 /* <fator> {(*|div|and) <fator> } */
 termo: termo lista_fator| fator {
-   printf("entrou em termo\n");
+
 };
 
 lista_fator:
@@ -456,9 +456,6 @@ lista_fator:
 /* regra 29 */
 fator: numero | variavel {
    char printCRVL[100];
-   printf("entrou em variavel\n");
-   printf("nivel lexico %d\n", carregada->nivel_lexico);
-   printf("deslocamento %d\n", carregada->deslocamento);
 	sprintf(printCRVL, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
 
 };
@@ -466,9 +463,7 @@ fator: numero | variavel {
 expressao_mais_menos_termo:expressao_mais_menos_termo lista_e_termo | termo ; //TODO: implementar
 
 lista_e_termo:
-	{
-		printf("Lista termo\n");
-	}
+
 	SOMA termo {
 		verifica_tipo(&tabelaTipo, "soma");
 		geraCodigo(NULL, "SOMA");}
