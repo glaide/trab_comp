@@ -20,12 +20,11 @@ typedef struct pilha_rotulo
 /*Operações padroẽs de pilha*/
 void cria_pilha_rotulo(pilha_rotulo *pilha_rotulo);
 void push_tabela_rotulos(pilha_rotulo *pilha, char *rotulo);
-void push_pilha_rotulo(pilha_rotulo *tabelaRot, char *novo_rotulo);
-void pop_pilha_rotulo(pilha_rotulo *tabelaRot, int tamanho_pilha);
+void pop_tabela_rotulos(pilha_rotulo *pilha, int tam_remover);
 
 /*Cria rotulo, recebe o numero em que esta o rotulo atual e cria ele*/
 char *cria_rotulo(int rotulo_atual);
 char *pega_rotulo_atual(pilha_rotulo *pilha);
-char *pega_Rotulo(pilha_rotulo *pilha, int n);
+char *pega_rotulo(pilha_rotulo *pilha, int n);
 
 #endif

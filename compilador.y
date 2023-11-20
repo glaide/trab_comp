@@ -70,7 +70,7 @@ bloco       : //TODO: rever todo esse bloco
                // momento em que é feita a parte do desvio
                // cria um novo rotulo
                char rotuloPrint[100];
-               rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
+               rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
 
@@ -80,7 +80,7 @@ bloco       : //TODO: rever todo esse bloco
               {
 
                char rotuloPrint[100];
-               rotuloAtual = pega_Rotulo(&pilhaRotulo,0);
+               rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
 
@@ -142,7 +142,7 @@ declara_procedimento: PROCEDURE IDENT
    //faz a impressao do mepa
    char printRotuloEntrada[100];
    sprintf(printRotuloEntrada, "ENPR %d", nivel_lexico);
-	geraCodigo(pega_Rotulo(&pilhaRotulo, 2), printRotuloEntrada);
+	geraCodigo(pega_rotulo(&pilhaRotulo, 2), printRotuloEntrada);
    // TODO: criar tipo de variavel para procedimento e add na tabela de simbolos
    nova_entrada=criaVariavelSimplesProcedimento(token,nivel_lexico, 0, entraProcedimento);
    push_tabela_simbolos(&tabela_simbolos, nova_entrada);
@@ -346,13 +346,28 @@ comando_while: WHILE {
       push_tabela_rotulos(&pilhaRotulo, ROTwhile_ini);
       push_tabela_rotulos(&pilhaRotulo, ROTwhile_fim);
 
-      geraCodigo(pega_Rotulo(&pilhaRotulo, 2), "NADA");
-   } expressao {}
-   DO{
+      geraCodigo(pega_rotulo(&pilhaRotulo, 2), "NADA");
+   } expressao DO
+   {
       char dsvf[100];
-		sprintf(dsvf, "DSVF %s", pega_Rotulo(&pilhaRotulo, 1));
+      rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
+		sprintf(dsvf, "DSVF %s", rotuloAtual);
 		geraCodigo(NULL, dsvf);
-   }
+   } comando_composto {
+
+      char dsvs[100];
+      rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
+		sprintf(dsvs, "DSVS %s",rotuloAtual);
+		geraCodigo(NULL, dsvs);
+
+		char rot[100];
+      rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
+		sprintf(rot, "%s", rotuloAtual);
+		geraCodigo(rot, "NADA");
+
+		pop_tabela_rotulos(&pilhaRotulo, 2);
+   };
+
 
 /* regra 25 */
 expressao: expressao_simples relacao_expressao_simples {
@@ -367,27 +382,25 @@ relacao_expressao_simples: relacao expressao_simples | nada
 
 /* regra 26 */
 relacao:
-	IGUAL{
-      // TODO: implementar
+	IGUAL {
       strcpy(sinal_da_comparacao,"CMIG");
    }
 	| DIFERENTE {
       strcpy(sinal_da_comparacao,"CMDG");
-     }
+   }
 	| MENOR {
       strcpy(sinal_da_comparacao,"CMME");
    }
 	| MENOR_IGUAL {
       strcpy(sinal_da_comparacao,"CMEG");
-
+   }
+   | MAIOR {
+      strcpy(sinal_da_comparacao,"CMMA");
    }
 	| MAIOR_IGUAL {
       strcpy(sinal_da_comparacao,"CMAG");
-
    }
-	| MAIOR {
-      strcpy(sinal_da_comparacao,"CMMA");
-    }
+
 ;
 
 /* regra 27 */

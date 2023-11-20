@@ -121,7 +121,7 @@ Grammar
 
    58 $@11: ε
 
-   59 comando_while: WHILE $@10 expressao $@11 DO
+   59 comando_while: WHILE $@10 expressao DO $@11 comando_composto
 
    60 expressao: expressao_simples relacao_expressao_simples
 
@@ -132,8 +132,8 @@ Grammar
    64        | DIFERENTE
    65        | MENOR
    66        | MENOR_IGUAL
-   67        | MAIOR_IGUAL
-   68        | MAIOR
+   67        | MAIOR
+   68        | MAIOR_IGUAL
 
    69 expressao_simples: mais_ou_menos expressao_mais_menos_termo
 
@@ -185,8 +185,8 @@ Terminals, with rules where they appear
     DIFERENTE (276) 64
     MENOR (277) 65
     MENOR_IGUAL (278) 66
-    MAIOR_IGUAL (279) 67
-    MAIOR (280) 68
+    MAIOR_IGUAL (279) 68
+    MAIOR (280) 67
     SOMA (281) 70 83
     SUBTRACAO (282) 71 84
     MULTIPLICACAO (283) 75
@@ -281,7 +281,7 @@ Nonterminals, with rules where they appear
         on right: 5 26 35
     comando_composto (61)
         on left: 37
-        on right: 9 46
+        on right: 9 46 59
     comandos (62)
         on left: 38 39
         on right: 37 38
@@ -888,7 +888,7 @@ State 59
 
 State 60
 
-   59 comando_while: WHILE • $@10 expressao $@11 DO
+   59 comando_while: WHILE • $@10 expressao DO $@11 comando_composto
 
     $default  reduce using rule 57 ($@10)
 
@@ -1021,7 +1021,7 @@ State 76
 
 State 77
 
-   59 comando_while: WHILE $@10 • expressao $@11 DO
+   59 comando_while: WHILE $@10 • expressao DO $@11 comando_composto
 
     SOMA       shift, and go to state 84
     SUBTRACAO  shift, and go to state 85
@@ -1120,11 +1120,9 @@ State 86
 
 State 87
 
-   59 comando_while: WHILE $@10 expressao • $@11 DO
+   59 comando_while: WHILE $@10 expressao • DO $@11 comando_composto
 
-    $default  reduce using rule 58 ($@11)
-
-    $@11  go to state 97
+    DO  shift, and go to state 97
 
 
 State 88
@@ -1218,9 +1216,11 @@ State 96
 
 State 97
 
-   59 comando_while: WHILE $@10 expressao $@11 • DO
+   59 comando_while: WHILE $@10 expressao DO • $@11 comando_composto
 
-    DO  shift, and go to state 115
+    $default  reduce using rule 58 ($@11)
+
+    $@11  go to state 115
 
 
 State 98
@@ -1253,16 +1253,16 @@ State 101
 
 State 102
 
-   67 relacao: MAIOR_IGUAL •
+   68 relacao: MAIOR_IGUAL •
 
-    $default  reduce using rule 67 (relacao)
+    $default  reduce using rule 68 (relacao)
 
 
 State 103
 
-   68 relacao: MAIOR •
+   67 relacao: MAIOR •
 
-    $default  reduce using rule 68 (relacao)
+    $default  reduce using rule 67 (relacao)
 
 
 State 104
@@ -1368,9 +1368,11 @@ State 114
 
 State 115
 
-   59 comando_while: WHILE $@10 expressao $@11 DO •
+   59 comando_while: WHILE $@10 expressao DO $@11 • comando_composto
 
-    $default  reduce using rule 59 (comando_while)
+    T_BEGIN  shift, and go to state 38
+
+    comando_composto  go to state 126
 
 
 State 116
@@ -1387,7 +1389,7 @@ State 117
     NUMERO  shift, and go to state 45
 
     numero  go to state 107
-    fator   go to state 126
+    fator   go to state 127
 
 
 State 118
@@ -1397,7 +1399,7 @@ State 118
     NUMERO  shift, and go to state 45
 
     numero  go to state 107
-    fator   go to state 127
+    fator   go to state 128
 
 
 State 119
@@ -1407,7 +1409,7 @@ State 119
     NUMERO  shift, and go to state 45
 
     numero  go to state 107
-    fator   go to state 128
+    fator   go to state 129
 
 
 State 120
@@ -1417,7 +1419,7 @@ State 120
     NUMERO  shift, and go to state 45
 
     numero  go to state 107
-    fator   go to state 129
+    fator   go to state 130
 
 
 State 121
@@ -1434,7 +1436,7 @@ State 122
     NUMERO  shift, and go to state 45
 
     numero  go to state 107
-    termo   go to state 130
+    termo   go to state 131
     fator   go to state 109
 
 
@@ -1449,7 +1451,7 @@ State 124
 
    83 lista_e_termo: $@12 • SOMA termo
 
-    SOMA  shift, and go to state 131
+    SOMA  shift, and go to state 132
 
 
 State 125
@@ -1461,33 +1463,40 @@ State 125
 
 State 126
 
+   59 comando_while: WHILE $@10 expressao DO $@11 comando_composto •
+
+    $default  reduce using rule 59 (comando_while)
+
+
+State 127
+
    75 lista_fator: MULTIPLICACAO fator •
 
     $default  reduce using rule 75 (lista_fator)
 
 
-State 127
+State 128
 
    76 lista_fator: DIVISAO fator •
 
     $default  reduce using rule 76 (lista_fator)
 
 
-State 128
+State 129
 
    77 lista_fator: DIV fator •
 
     $default  reduce using rule 77 (lista_fator)
 
 
-State 129
+State 130
 
    78 lista_fator: AND fator •
 
     $default  reduce using rule 78 (lista_fator)
 
 
-State 130
+State 131
 
    73 termo: termo • lista_fator
    84 lista_e_termo: SUBTRACAO termo •
@@ -1502,18 +1511,18 @@ State 130
     lista_fator  go to state 121
 
 
-State 131
+State 132
 
    83 lista_e_termo: $@12 SOMA • termo
 
     NUMERO  shift, and go to state 45
 
     numero  go to state 107
-    termo   go to state 132
+    termo   go to state 133
     fator   go to state 109
 
 
-State 132
+State 133
 
    73 termo: termo • lista_fator
    83 lista_e_termo: $@12 SOMA termo •

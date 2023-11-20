@@ -19,6 +19,26 @@ void push_tabela_rotulos(pilha_rotulo *pilha, char *rotulo)
     // incrementa o tamanho da pilha
     pilha->tamanho++;
 }
+
+void pop_tabela_rotulos(pilha_rotulo *pilha, int tam_remover)
+{
+    if (pilha->tamanho == 0)
+    {
+        printf("Pilha de rotulos vazia\n");
+        exit(1);
+    }
+    tipo_rotulo *aux = pilha->topo;
+    int i = 0;
+    while (i < tam_remover)
+    {
+        aux = pilha->topo;
+        pilha->topo = aux->prox;
+        free(aux);
+        pilha->tamanho--;
+        i++;
+    }
+}
+
 char *cria_rotulo(int rotulo_atual)
 {
     char *rotulo = (char *)malloc(5 * sizeof(char));
@@ -26,7 +46,7 @@ char *cria_rotulo(int rotulo_atual)
     return rotulo;
 }
 
-char *pega_Rotulo(pilha_rotulo *pilha, int n)
+char *pega_rotulo(pilha_rotulo *pilha, int n)
 {
     if (pilha->tamanho == 0)
     {
