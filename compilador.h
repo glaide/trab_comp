@@ -37,6 +37,12 @@ typedef enum simbolos
   simb_and,
   simb_soma,
   simb_subtracao,
+  simb_igual,
+  simb_diferente,
+  simb_menor,
+  simb_menor_igual,
+  simb_maior_igual,
+  simb_maior,
   simb_read,
   simb_write
 } simbolos;
