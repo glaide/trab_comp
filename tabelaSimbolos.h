@@ -44,7 +44,8 @@ typedef struct type_infos_tabela_simbolos
     char *rotulo, *identificador; // rotulo para chamada de func/proc, identificador para variaveis
     tipo_Pascal type;             // inteiro, real, booleano, caractere, desconhecido
     type_categoria categoria;     // variavel_simples, parametro_formal, procedimento, funcao
-    type_param_conhecido *parametros_formais;
+    // type_param_conhecido *parametros_formais; TODO: rever se necessário
+    type_passagem_parametro passagem_parametro; // valor ou referencia
     // possiveis outros campos: numero de parametros, numero de procedimentos, numero de funcoes (se necessario)
     int numero_parametros, numero_procedimentos, numero_funcoes;
     struct type_infos_tabela_simbolos *prox; // ponteiro para proximo elemento da tabela de simbolos
@@ -76,6 +77,7 @@ void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha);
 void imprime_tabela_simbolos_topo(type_infos_tabela_simbolos *aux);
 void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico);
 void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n);
+type_infos_tabela_simbolos *busca_tabela_simbolos(TypeTabelaSimbolosPilha *tabela_simbolos, char *identificador);
 
 // ---------------------------------------//
 

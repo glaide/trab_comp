@@ -2,4 +2,6 @@ program exemplo75 (input, output);
 var m, n:  integer;
 begin
     m := 1;
+    n := 2;
+
 end.
