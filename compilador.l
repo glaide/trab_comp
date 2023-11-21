@@ -113,16 +113,46 @@ end { simbolo = simb_end;
           return FECHA_PARENTESES;
  }
 
-\+ { simbolo = simb_soma;
+read { simbolo = simb_read;
+              strncpy (token, yytext, TAM_TOKEN);
+              IMPRIME("read");
+              return READ;
+}
+
+write { simbolo = simb_write;
+              strncpy (token, yytext, TAM_TOKEN);
+              IMPRIME("write");
+              return WRITE;
+}
+
+\+ { simbolo = simb_mais;
         strncpy (token, yytext, TAM_TOKEN);
         IMPRIME("soma");
         return SOMA;
 }
 
-\- { simbolo = simb_subtracao;
+\- { simbolo = simb_menos;
         strncpy (token, yytext, TAM_TOKEN);
         IMPRIME("subtracao");
         return SUBTRACAO;
+}
+
+\* { simbolo = simb_vezes;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("multiplicacao");
+        return MULTIPLICACAO;
+}
+
+\/ { simbolo = simb_divisao;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("divisao");
+        return DIVISAO;
+}
+
+div { simbolo = simb_div;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("div");
+        return DIV;
 }
 
 \= { simbolo = simb_igual;
@@ -161,7 +191,6 @@ end { simbolo = simb_end;
         return MAIOR;
 }
 
-
 while { simbolo = simb_while;
         strncpy (token, yytext, TAM_TOKEN);
         IMPRIME("while");
@@ -172,47 +201,6 @@ do { simbolo = simb_do;
        strncpy (token, yytext, TAM_TOKEN);
        IMPRIME("do");
        return DO;
-}
-
-integer { simbolo = simb_integer;
-           strncpy (token, yytext, TAM_TOKEN);
-           IMPRIME(" integer ");
-           return INTEGER;
-}
-\* { simbolo = simb_multiplicacao;
-        strncpy (token, yytext, TAM_TOKEN);
-        IMPRIME("multiplicacao ");
-        return MULTIPLICACAO;
-}
-
-\/ { simbolo = simb_divisao;
-        strncpy (token, yytext, TAM_TOKEN);
-        IMPRIME("divisao");
-        return DIVISAO;
-}
-
-div { simbolo = simb_div;
-        strncpy (token, yytext, TAM_TOKEN);
-        IMPRIME("div");
-        return DIV;
-}
-
-and { simbolo = simb_and;
-        strncpy (token, yytext, TAM_TOKEN);
-        IMPRIME("e");
-        return AND;
-}
-
-read { simbolo = simb_read;
-              strncpy (token, yytext, TAM_TOKEN);
-              IMPRIME("read");
-              return READ;
-}
-
-write { simbolo = simb_write;
-              strncpy (token, yytext, TAM_TOKEN);
-              IMPRIME("write");
-              return WRITE;
 }
 
 if { simbolo = simb_if;
@@ -232,10 +220,23 @@ else { simbolo = simb_else;
         IMPRIME("else");
         return ELSE;
 }
-procedure { simbolo = simb_procedure;
+
+procedure { simbolo = simb_procedimento;
+            strncpy (token, yytext, TAM_TOKEN);
+            IMPRIME("procedure");
+            return PROCEDURE;
+}
+
+function { simbolo = simb_funcao;
+            strncpy (token, yytext, TAM_TOKEN);
+            IMPRIME("function");
+            return FUNCTION;
+}
+
+integer { simbolo = simb_integer;
            strncpy (token, yytext, TAM_TOKEN);
-           IMPRIME("procedure da glaide");
-           return PROCEDURE;
+           IMPRIME("integer");
+           return INTEGER;
 }
 
 {numero} { simbolo = simb_numero;
@@ -250,8 +251,5 @@ procedure { simbolo = simb_procedure;
           return IDENT;
         }
 
+
 %%
-
-//%%
-
-

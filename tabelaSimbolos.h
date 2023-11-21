@@ -1,117 +1,78 @@
-#ifndef __TABELASIMB_H__
-#define __TABELASIMB_H__
+#ifndef __TABELASIMBOLOS_H__
+#define __TABELASIMBOLOS_H__
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef enum type_passagem_parametro
+#include "pilha.h"
+typedef enum tipo_passagem
 {
     VALOR,
     REFERENCIA
-} type_passagem_parametro;
+} tipo_passagem;
 
-typedef enum type_categoria
+typedef enum tipo_categoria
 {
-    variavel_simples,
-    parametro_formal,
+    var_simples,
+    param_formal,
     procedimento,
-    funcao
-} type_categoria;
+    funcao,
+} tipo_categoria;
 
-typedef enum tipo_Pascal
-{
-    integer,
-    boolean,
-    desconhecido
-} tipo_Pascal;
-typedef struct no_Tipo
-{
-    tipo_Pascal tipo;
-    struct no_Tipo *prox;
-} no_Tipo;
-typedef struct type_param_conhecido
-{
-    tipo_Pascal tipo;
-    type_passagem_parametro passagem_parametro;
-} type_param_conhecido; // tipo e passagem de parametro para vetor em caso de procedimento ou funcao
-
-typedef struct type_param_desc
+typedef struct parametro_nao_conhecido
 {
     char *identificador;
-    tipo_Pascal tipo;
-    type_passagem_parametro tipo_passado;
-} type_param_desc;
+    tipo_pascal tipo;
+    tipo_passagem passagem;
+} parametro_nao_conhecido;
 
-typedef struct type_infos_tabela_simbolos
+typedef struct type_info_tabela_simbolos
 {
-    int nivel_lexico, deslocamento, qnt_variaveis; // nivel_lexico = profundidade da tabela de simbolos
-    // deslocamento = endereco relativo ao nivel lexico
-    // qnt_variaveis = quantidade de variaveis declaradas na tabela de simbolos
-    char *rotulo, *identificador; // rotulo para chamada de func/proc, identificador para variaveis
-    tipo_Pascal type;             // inteiro, real, booleano, caractere, desconhecido
-    type_categoria categoria;     // variavel_simples, parametro_formal, procedimento, funcao
-    // type_param_conhecido *parametros_formais; TODO: rever se necessário
-    type_passagem_parametro passagem_parametro; // valor ou referencia
-    type_param_desc *parametros;                // vetor de parametros formais
-    // possiveis outros campos: numero de parametros, numero de procedimentos, numero de funcoes (se necessario)
-    int numero_parametros, numero_procedimentos;
-    struct type_infos_tabela_simbolos *prox; // ponteiro para proximo elemento da tabela de simbolos
+    char *identificador, *rotulo;
+    int nivel_lexico, deslocamento, numero_parametros, numero_procedimentos, numero_variaveis;
+    tipo_categoria categoria;
+    tipo_pascal tipo;
+    tipo_passagem passagem;
+    parametro_nao_conhecido *params;
+    struct type_info_tabela_simbolos *prox;
+} type_info_tabela_simbolos;
 
-} type_infos_tabela_simbolos;
-typedef struct pilha_no_procedimento
-{
-    int max, topo;
-    type_infos_tabela_simbolos **p;
-} pilha_no_procedimento;
-typedef struct type_tabela_simbolos_pilha
-{
-    int tamanho_pilha;
-    // ADICIONEI O TOPO PQ VAI PRECISAR
-
-    type_infos_tabela_simbolos *topo;
-
-    type_infos_tabela_simbolos **infos; // vetor de ponteiros para tabela de simbolos
-} TypeTabelaSimbolosPilha;
-
-// funcao para criar uma nova tabela de simbolos, fiz VOID pq criamos uma varivael do tipo tabela no comp.y
-// e passamos ela para criar_tabela_simbolo
-void criar_tabela_simbolos(TypeTabelaSimbolosPilha *tabelaSimbolos);
-// funcao para adicionar um novo elemento na tabela de simbolos
-
-type_infos_tabela_simbolos *criaVariavelSimples(char *indentificador, int nivelLexico, int descolocamento);
-type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador, int nivelLexico, int totalParametros, char *rotulo);
-
-// void adicionar_elemento_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
-//   Virou push_tabela_simbolos
-void push_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
-void pop_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, int qnt);
-void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha);
-// type_infos_tabela_simbolos pega_topo(TypeTabelaSimbolosPilha *pilha);
-void imprime_tabela_simbolos_topo(type_infos_tabela_simbolos *aux);
-void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico);
-void atualizaNumeroParametros(type_infos_tabela_simbolos *infos, TypeTabelaSimbolosPilha *p, int vars);
-void cria_pilha_no_procedimento(pilha_no_procedimento *p);
-void push_pilha_no_procedimento(pilha_no_procedimento *p, type_infos_tabela_simbolos *x);
-void *pop_pilha_no_procedimento(pilha_no_procedimento *p);
-void atualizaNumProcedimento(TypeTabelaSimbolosPilha *p, int nivel_lexico);
-void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n);
-type_infos_tabela_simbolos *busca_tabela_simbolos(TypeTabelaSimbolosPilha *tabela_simbolos, char *identificador);
-type_infos_tabela_simbolos *pega_posicao(TypeTabelaSimbolosPilha *tabela_simbolos, int posicao);
-
-// ---------------------------------------//
-
-typedef struct pilha_Tipo
+typedef struct pilha_simbolos
 {
     int tamanho;
-    no_Tipo *topo;
-} pilha_Tipo;
+    type_info_tabela_simbolos *topo;
+} pilha_simbolos;
 
-void cria_pilha_Tipo(pilha_Tipo *tabela_tipo);
-void push_pilha_Tipo(pilha_Tipo *tabela_tipo, tipo_Pascal tipo);
-void verifica_tipo(pilha_Tipo *tabela_tipo, char *operation);
-char *define_tipo(tipo_Pascal type);
+typedef struct pilha_no
+{
+    int max, topo;
+    type_info_tabela_simbolos **p;
+} pilha_no;
 
-tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo);
+// parte relacionada a pilha de nós
+void cria_pilha_no(pilha_no *p_no);
+void *pop_pilha_no(pilha_no *p_no);
+void push_pilha_no(pilha_no *p_no, type_info_tabela_simbolos *infos);
 
+void cria_pilha(pilha_simbolos *tabela_de_simbolos);
+void push(pilha_simbolos *tabela_de_simbolos, type_info_tabela_simbolos *novo_simb);
+type_info_tabela_simbolos *pega_topo(pilha_simbolos *tabela_de_simbolos);
+type_info_tabela_simbolos *pega_posicao(pilha_simbolos *tabela_de_simbolos, int n);
+type_info_tabela_simbolos *busca_pilha_simbolos(pilha_simbolos *tabela_de_simbolos, char *identificador);
+void pop(pilha_simbolos *tabela_de_simbolos, int n);
+type_info_tabela_simbolos *cria_variavel_simples(char *identificador, int nivel_lexico, int deslocamento);
+type_info_tabela_simbolos *cria_variavel_funcao(char *identificador, char *rotulo, int nivel_lexico, int numero_parametros, tipo_pascal tipo_retorno);
+type_info_tabela_simbolos *cria_variavel_procedure(char *identificador, char *rotulo, int nivel_lexico, int numero_parametros);
+type_info_tabela_simbolos *cria_variavel_formal(char *identificador, int nivel_lexico, int deslocamento, tipo_passagem passagem);
+void seta_tipos(pilha_simbolos *tabela_de_simbolos, tipo_pascal tipo, int n);
+
+void imprime_tabela(pilha_simbolos *tabela_de_simbolos);
+
+void atualiza_parametros(type_info_tabela_simbolos *p, pilha_simbolos *tabela_de_simbolos, int parametros_total);
+void atualiza_num_procedimentos(pilha_simbolos *p, int nivel_lexico);
+void atualiza_num_variaveis(pilha_simbolos *p, int vars, int nivel_lexico);
+
+void seta_else();
+void inicia_else();
 #endif

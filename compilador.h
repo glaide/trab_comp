@@ -28,27 +28,30 @@ typedef enum simbolos
   simb_atribuicao,
   simb_abre_parenteses,
   simb_fecha_parenteses,
+  simb_rotulo,
+  simb_procedimento,
+  simb_funcao,
+  simb_if,
+  simb_then,
+  simb_else,
   simb_while,
   simb_do,
-  simb_integer,
-  simb_multiplicacao,
-  simb_divisao,
-  simb_div,
-  simb_and,
-  simb_soma,
-  simb_subtracao,
   simb_igual,
   simb_diferente,
   simb_menor,
   simb_menor_igual,
   simb_maior_igual,
   simb_maior,
+  simb_mais,
+  simb_menos,
+  simb_vezes,
+  simb_divisao,
+  simb_div,
+  simb_abre_colchetes,
+  simb_fecha_colchetes,
+  simb_integer,
   simb_read,
-  simb_write,
-  simb_then,
-  simb_else,
-  simb_if,
-  simb_procedure,
+  simb_write
 } simbolos;
 
 /* -------------------------------------------------------------------
@@ -66,5 +69,6 @@ extern int nl;
  * ------------------------------------------------------------------- */
 
 void geraCodigo(char *, char *);
+int imprimeErro(char *);
 int yylex();
 void yyerror(const char *s);

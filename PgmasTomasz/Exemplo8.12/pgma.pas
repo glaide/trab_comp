@@ -1,8 +1,8 @@
 program exemplo12 (input, output);
 var x :  integer;
    procedure p (var t :  integer);
-   label 100, 200; 
-   var s :  integer;  
+   label 100, 200;
+   var s :  integer;
       function f(z : integer): integer;
       begin
          if z<0 then
@@ -13,7 +13,7 @@ var x :  integer;
             else
                f:=f(z-2)*z+1
       end;
-   
+
 
    begin
       100:
@@ -33,10 +33,10 @@ var x :  integer;
          p(y);
          write(y)
       end;
-   
+
    begin
       q
-   end; 
+   end;
 
 begin
    read(x);
