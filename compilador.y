@@ -235,7 +235,7 @@ comando_sem_rotulo: comando_atribuicao
                   | comando_if
                   | comando_while
                   | read
-                  /* | write */
+                  | write
                   | nada;
 
 read: READ ABRE_PARENTESES lista_leitura FECHA_PARENTESES;
@@ -260,15 +260,15 @@ simbolo_leitura:
 	}
 ;
 
-/* write:
+write:
    	WRITE ABRE_PARENTESES lista_escrita FECHA_PARENTESES
-; */
+;
 
 lista_escrita:
-	lista_escrita VIRGULA expressao
-   { geraCodigo (NULL, "IMPR"); }
+	lista_escrita VIRGULA expressao { geraCodigo (NULL, "IMPR"); }
 	| expressao { geraCodigo (NULL, "IMPR"); }
 ;
+
 /* regra 19 */
 comando_atribuicao: variavel ATRIBUICAO expressao
 {
