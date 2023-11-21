@@ -17,7 +17,7 @@ int numero_variaveis, numero_parametros, nivel_lexico, deslocamento;
 int entra_procedimento,aux_var, novas_variaveis, novos_param,por_ref;
 char *rotulo_fim_subr;
 int rotulo_print = 0;
-int subrt = 0;
+
 int num_params_chamada;
 char comparacao[100], rotuloPrint[100], *funcao_atual;
 
@@ -77,21 +77,21 @@ tipo:
 
 
 
-bloco       :
-        parte_declara_vars
+bloco:
+     		parte_declara_vars
 				{
+					// faz o desvio pro rotulo
 					char rotsaida[100];
-      		sprintf(rotsaida, "DSVS %s", pega_rotulo(&pilha_rotulos,0));
+      				sprintf(rotsaida, "DSVS %s", pega_rotulo(&pilha_rotulos,0));
 					geraCodigo(NULL, rotsaida);
-					printf("bloco\n");
 				}
-			  parte_declara_sub_rotinas
+			parte_declara_sub_rotinas
 			  {
 				char rotsaida[100];
-     		sprintf(rotsaida, "%s", pega_rotulo(&pilha_rotulos,0));
-     		geraCodigo(rotsaida, "NADA");
+     			sprintf(rotsaida, "%s", pega_rotulo(&pilha_rotulos,0));
+     			geraCodigo(rotsaida, "NADA");
 				}
-        comando_composto
+        	comando_composto
 ;
 
 parte_declara_vars:  var {
@@ -102,20 +102,17 @@ parte_declara_vars:  var {
 }
 ;
 
-parte_declara_sub_rotinas:
-	parte_declara_sub_rotinas  opcoes_sub_rotinas
-	| nada
+parte_declara_sub_rotinas: parte_declara_sub_rotinas regra_subrotina | nada
 ;
 
-opcoes_sub_rotinas:
+regra_subrotina:
 	declaracao_procedimento {
 		atualiza_num_procedimentos(&tabelaSimbolos, nivel_lexico);
 	} PONTO_E_VIRGULA
 	| declaracao_funcao {
 		atualiza_num_procedimentos(&tabelaSimbolos, nivel_lexico);
 	} PONTO_E_VIRGULA
-	| nada
-;
+	| nada;
 
 
 var         : VAR declara_vars | declara_vars;
@@ -125,8 +122,7 @@ declara_vars: declara_vars declara_var| declara_var;
 declara_var : {
               novas_variaveis = 0;
 }
-              lista_id_var DOIS_PONTOS
-              tipo
+              lista_id_var DOIS_PONTOS tipo
               {
                 numero_variaveis += novas_variaveis;
 
@@ -168,11 +164,12 @@ lista_idents: lista_idents VIRGULA IDENT{
 comando_while:
 	WHILE
 	{
+		// cria os rotulos de entrada e saida
 		char *inicio_while = cria_rotulo(rotulo_print);
 		rotulo_print++;
 		char *fim_while = cria_rotulo(rotulo_print);
 		rotulo_print++;
-
+		// insere os rotulos na pilha de rotulos
 		push_pilha_rotulo(&pilha_rotulos, inicio_while);
 		push_pilha_rotulo(&pilha_rotulos, fim_while);
 
@@ -182,6 +179,7 @@ comando_while:
 	expressao DO
 	{
 		char dsvf[100];
+		// verificar desvio
 		sprintf(dsvf, "DSVF %s", pega_rotulo(&pilha_rotulos, 1));
 		geraCodigo(NULL, dsvf);
 	}
@@ -201,7 +199,7 @@ comando_while:
 
 
 comando_if:
-	if_then cond_else
+	if else
 	{
 		char rot[100];
 		geraCodigo(pega_rotulo(&pilha_rotulos, 2), "NADA");
@@ -209,11 +207,11 @@ comando_if:
 	}
 ;
 
-if_then:
+if:
 	IF  expressao
 	{
-		inicia_else(); //inicializa se necessario, incrementa o iterador
-		// Gera rotulos de entrada e saida do IF
+		inicia_else(); //testar se tem else
+		// Gera rotulos de entrada e saida do if
 		char *RotIfInicio = cria_rotulo(rotulo_print);
 		rotulo_print++;
 		char *RotIfFim = cria_rotulo(rotulo_print);
@@ -221,44 +219,36 @@ if_then:
 
 		push_pilha_rotulo(&pilha_rotulos, RotIfInicio);
 		push_pilha_rotulo(&pilha_rotulos, RotIfFim);
-		//push_pilha_rotulo(&pilha_rotulos, RotIfInicio);
 
-		// Imprime rotulo de entrada no inicio do if
+		// imprime rotulo de entrada do if
 		char rot[100];
 		sprintf(rot, "DSVF %s", pega_rotulo(&pilha_rotulos, 1));
 		geraCodigo(NULL, rot);
 	} THEN comando_sem_rotulo
 ;
 
-cond_else:
+else:
 	ELSE
 	{
-		seta_else(); //marca pro iterador que a iésima cláusula tem else
-		// Imprime rotulo de entrada no inicio do if
+		seta_else();//seta que ta no else
+
 		char rot[100];
 		sprintf(rot, "DSVS %s", pega_rotulo(&pilha_rotulos, 2));
 		geraCodigo(NULL, rot);
 
-		// Imprime rotulo de entrada no fim do if
+		// imprime rotulo de entrada no fim do if
 		geraCodigo(pega_rotulo(&pilha_rotulos, 1), "NADA");
 	}
-	else_multiplo_unico
-	| nada
-;
+	else_multiplo_unico| nada;
 
-else_multiplo_unico:
-	comando_sem_rotulo
-;
+else_multiplo_unico: comando_sem_rotulo;
 
 declaracao_procedimento:
-	PROCEDURE {
-		printf("declaracao procedimento\n");
-		subrt = 1;
-		}
+	PROCEDURE
 	IDENT
 	{
 
-		// Gera rotulos de entrada e saida
+		// gera rotulos de entrada e saida
 		char *RotInicioSubrotina = cria_rotulo(rotulo_print);
 		rotulo_print++;
 
@@ -268,42 +258,41 @@ declaracao_procedimento:
 		push_pilha_rotulo(&pilha_rotulos, rotulo_fim_subr);
 		nivel_lexico++;
 
-		// Imprime rotulo de entrada da subrotina
+		// imprime rotulo de entrada da subrotina
 		char rotentrada[100];
 		sprintf(rotentrada, "ENPR %d", nivel_lexico);
 		geraCodigo(pega_rotulo(&pilha_rotulos, 2), rotentrada);
 
 		novaEntrada = cria_variavel_procedure(token, RotInicioSubrotina, nivel_lexico, 0);
 		push(&tabelaSimbolos, novaEntrada);
-
-
+		// Insere na pilha de nos
 		push_pilha_no(&tabelaNode,  novaEntrada);
 		procedimento_atual = novaEntrada;
 	}
 	{ novos_param = 0; } parametros_formais_vazio PONTO_E_VIRGULA
 	{
-
+		// Zera para ser utilizado na subrotina e salva para ser recuperado
 		aux_var = numero_variaveis;
 		numero_variaveis = 0;
 		deslocamento = 0;
 	}
 	bloco
 	{
-		printf("bloco\n");
+
 		procedimento_atual = (type_info_tabela_simbolos*) pop_pilha_no(&tabelaNode);
-		pop(&tabelaSimbolos, procedimento_atual->numero_procedimentos); // Remove procedimentos da tabela de simbolos
+		pop(&tabelaSimbolos, procedimento_atual->numero_procedimentos); // tira procedure de simbolos
 
 		// DMEM nas variaveis do procedimento
 		pop(&tabelaSimbolos, procedimento_atual->numero_variaveis);
 		char dmem[100];
 		sprintf(dmem, "DMEM %d", procedimento_atual->numero_variaveis);
 		geraCodigo(NULL, dmem);
-		pop(&tabelaSimbolos, procedimento_atual->numero_parametros); // Remove parametros da tabela de simbolos
+		pop(&tabelaSimbolos, procedimento_atual->numero_parametros); // tira parametros de simbolos
 
-		// Pega procedimento para printar infos da saida dele
+
 		destino = pega_topo(&tabelaSimbolos);
 		if(destino == NULL) {
-			printf("Procedimento nao encontrado na tabela de simbolos.\n");
+			printf("Tabela de simbolos: procedimento nao encontrado!\n");
 			exit(1);
 		}
 		char command[100];
@@ -313,20 +302,19 @@ declaracao_procedimento:
 		novos_param = 0;
 		nivel_lexico--;
 
-		destino = NULL; // Libera variavel destino
-		numero_variaveis = aux_var;    // Restabelece numero de variaveis no nivel lexico
-		subrt = 0;
+		destino = NULL;
+		numero_variaveis = aux_var;
 		pop_pilha_rotulo(&pilha_rotulos, 2);
 
 	}
 ;
 
 declaracao_funcao:
-  FUNCTION{ subrt = 1; }
+  FUNCTION
   IDENT
   {
 
-	// Gera rotulos de entrada e saida
+
 	char *RotInicioSubrotina = cria_rotulo(rotulo_print);
 	rotulo_print++;
 
@@ -336,12 +324,12 @@ declaracao_funcao:
 	push_pilha_rotulo(&pilha_rotulos, rotulo_fim_subr);
 	nivel_lexico++;
 
-	// Imprime rotulo de entrada da subrotina
+
 	char rotentrada[100];
 	sprintf(rotentrada, "ENPR %d", nivel_lexico);
 	geraCodigo(pega_rotulo(&pilha_rotulos, 2), rotentrada);
 
-	// Verifica se é uma nova entrada de função
+
 	if (funcao_atual != NULL) {
 		strcpy(funcao_atual, token);
 		novaEntrada = cria_variavel_funcao(token, RotInicioSubrotina, nivel_lexico, 0, integer);
@@ -349,12 +337,10 @@ declaracao_funcao:
 		push_pilha_no(&tabelaNode,  novaEntrada);
 		procedimento_atual = novaEntrada;
 	}
-
-  }
-  { novos_param = 0; } parametros_formais_vazio DOIS_PONTOS tipo PONTO_E_VIRGULA
+novos_param = 0;
+  } parametros_formais_vazio DOIS_PONTOS tipo PONTO_E_VIRGULA
   {
-    // Zera para ser utilizado na subrotina
-    // Mas salva VALOR para ser recuperado
+
     aux_var = numero_variaveis;
     numero_variaveis = 0;
     deslocamento = 0;
@@ -362,20 +348,20 @@ declaracao_funcao:
   bloco
   {
 	procedimento_atual = (type_info_tabela_simbolos*) pop_pilha_no(&tabelaNode);
-	pop(&tabelaSimbolos, procedimento_atual->numero_procedimentos); // Remove procedimentos da tabela de simbolos
+	pop(&tabelaSimbolos, procedimento_atual->numero_procedimentos);
 
-	// DMEM nas variáveis do procedimento
+
 	pop(&tabelaSimbolos, procedimento_atual->numero_variaveis);
 	char dmem[100];
 	sprintf(dmem, "DMEM %d", procedimento_atual->numero_variaveis);
 	geraCodigo(NULL, dmem);
 
-	pop(&tabelaSimbolos, procedimento_atual->numero_parametros); // Remove parâmetros da tabela de símbolos
+	pop(&tabelaSimbolos, procedimento_atual->numero_parametros);
 
-	// Pega procedimento para imprimir informações da saída dele
+
 	destino = pega_topo(&tabelaSimbolos);
 	if (destino == NULL) {
-		printf("Procedimento não encontrado na tabela de símbolos.\n");
+		printf("Tabela de simbolos: rocedimento não encontrado!\n");
 		exit(1);
 	}
 
@@ -389,15 +375,13 @@ declaracao_funcao:
 	destino = NULL; // Libera variável destino
 	numero_variaveis = aux_var;    // Restabelece número de variáveis no nível léxico
 
-	// Verifica se há subrotina na pilha de rótulos antes de tentar remover
+
 
     pop_pilha_rotulo(&pilha_rotulos, 2);
   }
 ;
 
-parametros_formais_vazio:
-	parametros_formais
-	| nada;
+parametros_formais_vazio: parametros_formais| nada;
 
 parametros_formais:
 ABRE_PARENTESES { numero_parametros = 0; }
@@ -436,15 +420,7 @@ comando:
 ;
 
 nunero_nada:
-
-	numero
-	{
-		printf("numero ou vazio\n");
-}
-	 DOIS_PONTOS {
-		printf("dois pontos\n");
-	 }
-	| nada
+	numero DOIS_PONTOS | nada
 ;
 
 nada:;
@@ -468,12 +444,7 @@ chama_procedimento:
 		procedimento_atual = destino;
 		sprintf(rotuloPrint, "CHPR %s, %d", destino->rotulo, nivel_lexico);
 		entra_procedimento = 1;
-		   printf("sprintf(printRotuloProcedimento, , destino->rotulo, nivel_lexico);\n\n");
-   printf("sprintf(printRotuloProcedimento, , destino->rotulo, nivel_lexico);\n\n");
-   printf("sprintf(printRotuloProcedimento, , destino->rotulo, nivel_lexico);\n\n");
-   printf("sprintf(printRotuloProcedimento, , destino->rotulo, nivel_lexico);\n\n");
-   printf("sprintf(printRotuloProcedimento, , destino->rotulo, nivel_lexico);\n\n");
-		//geraCodigo(NULL, rotuloPrint);
+
    	}
 	ABRE_PARENTESES {
 		 novos_param = 0;
@@ -539,11 +510,11 @@ expressao:
 
 relacao_exp_simples_ou_vazio:
 	relacao expressao_simples
-	{
+	/* {
 
 		verifica_tipo(&tabelaTipo, "relacional");
 		geraCodigo(NULL, comparacao);
-	}
+	} */
 	| nada
 {
    printf("entrou nesse nada\n");
