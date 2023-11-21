@@ -232,6 +232,11 @@ else { simbolo = simb_else;
         IMPRIME("else");
         return ELSE;
 }
+procedure { simbolo = simb_procedure;
+           strncpy (token, yytext, TAM_TOKEN);
+           IMPRIME("procedure da glaide");
+           return PROCEDURE;
+}
 
 {numero} { simbolo = simb_numero;
           strncpy (token, yytext, TAM_TOKEN);
@@ -244,11 +249,7 @@ else { simbolo = simb_else;
           IMPRIME(" ident  ");
           return IDENT;
         }
-procedure { simbolo = simb_procedure;
-           strncpy (token, yytext, TAM_TOKEN);
-           IMPRIME("procedure da glaide");
-           return PROCEDURE;
-}
+
 %%
 
 //%%
