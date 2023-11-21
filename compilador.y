@@ -61,14 +61,16 @@ programa    :{ //TODO: rever todo esse bloco
              }
 ;
 
-parametros_ou_nada: parametros {
-
-}
+parametros_ou_nada:  parametros
                   | nada {
 
                   };
 
-parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES;
+parametros: {
+   printf("2\n\n");
+}ABRE_PARENTESES {
+   printf("2\n\n");
+}lista_idents FECHA_PARENTESES;
 
 nada: {
 
@@ -87,10 +89,13 @@ bloco       : //TODO: rever todo esse bloco
               }
               parte_declara_sub_rotinas
               {
+               printf("caiu no bloco\n");
+
                char rotuloPrint[100];
                rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
+
               }
               comando_composto;
 
@@ -102,9 +107,6 @@ parte_declara_vars:  var {
 		sprintf(amem, "AMEM %d", num_vars);
 		atualizaNumeroVariaveis(&tabela_simbolos, num_vars, nivel_lexico);
 		geraCodigo(NULL, amem);
-
-
-
 
 }
 ;
@@ -124,10 +126,16 @@ declara_vars: declara_vars declara_var {
 
 /* regra 11 */
 /* pode ter mais de uma subrotila */
-parte_declara_sub_rotinas: parte_declara_sub_rotinas
-regra_sub_rotina | nada;
+parte_declara_sub_rotinas: {
+   printf("caiu no parte_declara_sub_rotinas\n");
+}
+parte_declara_sub_rotinas regra_sub_rotina {
 
-regra_sub_rotina:  declara_procedimento {atualizaNumProcedimento(&tabela_simbolos, nivel_lexico);} PONTO_E_VIRGULA
+} | nada ;
+
+regra_sub_rotina:  declara_procedimento {
+   atualizaNumProcedimento(&tabela_simbolos, nivel_lexico);
+   } PONTO_E_VIRGULA
  | nada; //TODO: implementar
 
 /* regra 12 */
@@ -164,6 +172,7 @@ declara_procedimento: PROCEDURE  IDENT
 
    char printRotuloSaida[100];
    pop_tabela_simbolos(&tabela_simbolos, procedimento_atual->qnt_variaveis);
+   printf("caiu no declara_procedimento\n");
 	sprintf(printRotuloSaida, "DMEM %d", procedimento_atual->qnt_variaveis);
 	geraCodigo(NULL, printRotuloSaida);
    pop_tabela_simbolos(&tabela_simbolos, procedimento_atual->numero_parametros);
@@ -178,11 +187,14 @@ declara_procedimento: PROCEDURE  IDENT
 
 };
 
-parametros_formais_ou_nada: parametros_formais | nada;
+parametros_formais_ou_nada:
+parametros_formais | nada;
 
 /* regra 14 */
-parametros_formais: ABRE_PARENTESES {
+parametros_formais:{ printf("3\n\n");} ABRE_PARENTESES {
 qnt_parametros=0;
+   printf("3\n\n");
+
 }
 lista_parametros_formais FECHA_PARENTESES {
    type_infos_tabela_simbolos *aux = pega_posicao(&tabela_simbolos,qnt_parametros);
@@ -200,27 +212,43 @@ secao_parametros_formais: var_ou_nada lista_idents DOIS_PONTOS tipo;
 
 var_ou_nada: VAR | nada;
 
+comando_chama_procedimento_atribuicao:
+{
+   printf("caiu no comando_chama_procedimento_atribuicao\n");
+}
+ comando_atribuicao ;
+ /* |
+comando_chama_procedimento; */
+
+
 comando_chama_procedimento: {
    printf("chamou procedimento\n");
    esta_no_procedimento = 1;
    procedimento_atual = destino;
-
+   printf("identifacor: %s\n", destino->identificador);
+   printf("rotulo: %s\n", destino->rotulo);
+   printf("nivel_lexico: %d\n", nivel_lexico);
 	sprintf(printRotuloProcedimento, "CHPR %s, %d", destino->rotulo, nivel_lexico);
+   printf("sprintf(printRotuloProcedimento, destino->rotulo, nivel_lexico);!!!!!\n\n");
 
 } ABRE_PARENTESES {
    qnt_novos_parametros=0;
+   printf("abriu parenteses\n\n");
 } expressoes_ou_nada FECHA_PARENTESES {
    esta_no_procedimento = 0;
    geraCodigo(NULL, printRotuloProcedimento);
    destino = NULL;
 
-}|
-{
-   procedimento_atual = destino;
-   sprintf(printRotuloProcedimento, "CHPR %s, %d", destino->rotulo, nivel_lexico);
-	geraCodigo(NULL, printRotuloProcedimento);
-   destino = NULL;
-};
+}
+|
+ {
+    procedimento_atual = destino;
+    printf("sprintf(printRotuloProcedimento, , destino->rotulo, nivel_lexico);\n\n");
+    sprintf(printRotuloProcedimento, "CHPR %s, %d", destino->rotulo, nivel_lexico);
+ 	geraCodigo(NULL, printRotuloProcedimento);
+    destino = NULL;
+ }
+;
 
 expressoes_ou_nada: expressoes | nada;
 
@@ -313,17 +341,24 @@ numero_ou_nada: numero {
 } ;
 
 /* regra 18 */
-comando_sem_rotulo: comando_atribuicao
-                  /* | comando_chama_procedimento */
-                  | comando_composto
+comando_sem_rotulo:
+
+variavel
+
+comando_chama_procedimento_atribuicao
+
+                  | {printf("caiu aqui antes\n");}comando_composto
                   | comando_if
                   | comando_while
                   | read
                   | write
-                  | nada
-                  | comando_chama_procedimento;
+                  | nada;
 
-read: READ ABRE_PARENTESES lista_leitura FECHA_PARENTESES;
+read: READ {
+   printf("1\n\n");
+}ABRE_PARENTESES {
+   printf("1\n\n");
+} lista_leitura FECHA_PARENTESES;
 
 lista_leitura:
    	lista_leitura VIRGULA simbolo_leitura | simbolo_leitura;
@@ -348,7 +383,13 @@ simbolo_leitura:
 ;
 
 write:
-   	WRITE ABRE_PARENTESES lista_escrita FECHA_PARENTESES
+   	WRITE {
+   printf("4\n\n");
+
+      } ABRE_PARENTESES {
+   printf("4\n\n");
+
+      } lista_escrita FECHA_PARENTESES
 ;
 
 lista_escrita:
@@ -357,14 +398,18 @@ lista_escrita:
 ;
 
 /* regra 19 */
-comando_atribuicao: variavel ATRIBUICAO expressao
-{
+comando_atribuicao: variavel
+{printf("caiu aqui antes!!!!\n");}
+ATRIBUICAO
+{printf("caiu aqui dps\n");}
 
+ expressao
+{
 
 		verifica_tipo(&pilha_tipo, "atribuicao");
 		char printARM[100];
       // verifica o tipo de passagem de parametro
-      printf("passagem de parametro %d\n", destino->passagem_parametro);
+
 		if (destino->passagem_parametro == VALOR)
 			sprintf(printARM, "ARMZ %d, %d", destino->nivel_lexico, destino->deslocamento);
 		else
@@ -376,24 +421,22 @@ comando_atribuicao: variavel ATRIBUICAO expressao
 /* regra 30 */
 
 variavel: IDENT {
-   printf("caiu no 6\n");
+
 
    if (destino == NULL) {
-         printf("Variavel nao declarada: %s\n", token);
+      printf("ou foi nesse\n");
+         printf("Variavel entrou em destino: %s\n", token);
          destino = busca_tabela_simbolos(&tabela_simbolos, token);
-
+         printf("destino->torulo: %s\n", destino->rotulo) ;
          if (destino == NULL) {
             printf("Variavel nao declarada: %s\n", token);
             exit(1);
          }
-
          push_pilha_Tipo(&pilha_tipo, destino->type);
-
    }
    else
     {
-         printf("Variavel entrou em carregada: %s\n", token);
-
+      printf("Variavel entrou em carregada: %s\n", token);
       carregada = busca_tabela_simbolos(&tabela_simbolos, token);
       if (carregada == NULL) {
 
@@ -458,10 +501,10 @@ comando_if:
        };
 
 if_then: IF {
-   printf("passou do if\n");
+
 }expressao
       {
-         printf("sinal da comparacao\n");
+
       char *inicio_If = cria_rotulo(num_Rotulos);
       num_Rotulos++;
 		char *fim_If = cria_rotulo(num_Rotulos);
@@ -556,6 +599,7 @@ fator: numero | variavel {
          // verifica se é funcao
 			if(carregada->categoria == funcao) {
 				char chamaProcedure[100];
+            printf("sprintf(chamaProcedure, CHPR, carregada->rotulo, nivel_lexico);\n\n");
 				sprintf(chamaProcedure, "CHPR %s, %d", carregada->rotulo, nivel_lexico);
 				geraCodigo(NULL, chamaProcedure);
 
@@ -580,7 +624,8 @@ fator: numero | variavel {
             eh_ref_carregada = (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && carregada->passagem_parametro == REFERENCIA);
 
             if (passagem_parametro == VALOR || eh_ref_carregada) {
-               sprintf(comando, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+{               printf("entrou aqui \n");
+               sprintf(comando, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);}
             } else if (esta_no_procedimento >= 1 && passagem_parametro == REFERENCIA) {
                sprintf(comando, "CREN %d, %d", carregada->nivel_lexico, carregada->deslocamento);
             } else {
@@ -596,6 +641,7 @@ fator: numero | variavel {
 
 			if(destino->categoria == funcao) {
 				char chamaProcedure[100];
+            printf("sprintf(chamaProcedure, CHPR destino->rotulo, nivel_lexico);˜˜˜˜˜˜˜\n");
 				sprintf(chamaProcedure, "CHPR %s, %d", destino->rotulo, nivel_lexico);
 				geraCodigo(NULL, chamaProcedure);
 			}
@@ -642,6 +688,7 @@ lista_e_termo:
 %%
 
 int main (int argc, char** argv) {
+
    FILE* fp;
    extern FILE* yyin;
 
@@ -662,11 +709,12 @@ int main (int argc, char** argv) {
  * ------------------------------------------------------------------- */
 
    yyin=fp;
-   yyparse();
+
+
    criar_tabela_simbolos(&tabela_simbolos);
    cria_pilha_rotulo(&pilhaRotulo);
    cria_pilha_Tipo(&pilha_tipo);
    cria_pilha_no_procedimento(&pilha_no);
-
+   yyparse();
    return 0;
 }

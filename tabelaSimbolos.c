@@ -73,6 +73,7 @@ void pop_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, int qnt)
         pilha->topo = aux->prox;
         free(aux);
         pilha->tamanho_pilha--;
+        i++;
     }
 }
 
@@ -124,6 +125,7 @@ type_infos_tabela_simbolos *busca_tabela_simbolos(TypeTabelaSimbolosPilha *tabel
     {
         if (strcmp(aux->identificador, identificador) == 0)
         {
+            printf("Identificador: %s\n", aux->identificador);
             return aux;
         }
         aux = aux->prox;
@@ -210,9 +212,14 @@ void atualizaNumeroParametros(type_infos_tabela_simbolos *infos, TypeTabelaSimbo
 }
 void cria_pilha_no_procedimento(pilha_no_procedimento *p)
 {
-    p->max = 8;
+    printf("entrou no cria_pilha_no_procedimento\n");
+    int aux = 8;
+    printf("Valor de aux: %d\n", aux);
+    p->max = aux;
     p->p = malloc(sizeof(type_infos_tabela_simbolos *) * p->max);
     p->topo = 0;
+    printf("Valor de p->topo: %d\n", p->topo);
+    printf("Valor de p->max: %d\n", p->max);
 }
 
 void *pop_pilha_no_procedimento(pilha_no_procedimento *p)
@@ -223,9 +230,12 @@ void *pop_pilha_no_procedimento(pilha_no_procedimento *p)
 
 void push_pilha_no_procedimento(pilha_no_procedimento *p, type_infos_tabela_simbolos *x)
 {
-
+    printf("entrou no push_pilha_no_procedimento\n");
+    printf("Valor de p->topo: %d\n", p->topo);
+    printf("Valor de p->max: %d\n", p->max);
     if (p->topo == p->max - 1)
     {
+        printf("entrou no if do push_pilha_no_procedimento\n");
         p->max *= 2;
         p->p = realloc(p->p, sizeof(type_infos_tabela_simbolos *) * p->max);
     }
@@ -252,6 +262,7 @@ void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n)
 
 void cria_pilha_Tipo(pilha_Tipo *tabela_tipo)
 {
+    printf("entrou no cria_pilha_Tipo\n");
     tabela_tipo->topo = NULL;
     tabela_tipo->tamanho = 0;
 }
@@ -265,7 +276,6 @@ void push_pilha_Tipo(pilha_Tipo *tabela_tipo, tipo_Pascal tipo_Pascal)
     novo->prox = tabela_tipo->topo;
     tabela_tipo->topo = novo;
     tabela_tipo->tamanho++;
-    printf("Tamanho atual da pilha: %d\n", tabela_tipo->tamanho);
 }
 
 tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo)
