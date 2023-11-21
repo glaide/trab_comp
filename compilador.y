@@ -12,108 +12,98 @@
 #include "tabelaSimbolos.h"
 #include "pilha.h"
 
-int por_ref, numero_variaveis, numero_parametros, aux_var, novas_variaveis, novos_param, nivel_lexico, deslocamento,numero_parametros_chamada;
-unsigned int temElse, it_temElse;
-int entra_procedimento;
-char chama_proc[100];
-char *rotulo_fim_subr;
+int por_ref, numero_variaveis, numero_parametros, aux_var, novas_variaveis, novos_param, nivel_lexico, deslocamento,numero_parametros_chamada,entra_procedimento;
 int rotulo_print = 0;
 int subrt = 0;
-char comparacao[100], *funcao_atual;
+char comparacao[100],chama_proc[100], *funcao_atual, *rotulo_fim_subr;
 pilha_simbolos tabelaSimbolos;
 type_info_tabela_simbolos *novaEntrada, *variavelDestino, *variavel_carregada, *procedimentoAtual;
 tipo_pilha tabelaTipo;
 pilha_rotulo pilha_rotulos;
 pilha_no pilhano;
 
-
-
-
 %}
 
 %token PROGRAM ABRE_PARENTESES FECHA_PARENTESES
 %token VIRGULA PONTO_E_VIRGULA DOIS_PONTOS PONTO
 %token T_BEGIN T_END VAR IDENT ATRIBUICAO
-%token INTEGER
+%token INTEGER OR AND
 %token WHILE DO IF THEN ELSE
 %token MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL IGUAL DIFERENTE
 %token SOMA SUBTRACAO MULTIPLICACAO DIVISAO DIV
 %token NUMERO READ WRITE
-%token OR AND NOT
 %token PROCEDURE FUNCTION
 
 
 %%
 
 programa    :{
-             geraCodigo (NULL, "INPP");
-             char * RotInicioSubrotina = cria_rotulo(rotulo_print);
-						 rotulo_print++;
-						 push_pilha_rotulo(&pilha_rotulos, RotInicioSubrotina);
-						 procedimentoAtual = cria_variavel_procedure("main", RotInicioSubrotina, 0, 0);
-						 push(&tabelaSimbolos, procedimentoAtual);
-						 push_pilha_no(&pilhano, procedimentoAtual);
-						}
-             PROGRAM IDENT
-			 			 parametros_ou_vazio PONTO_E_VIRGULA
-             bloco PONTO {
-							 procedimentoAtual = pop_pilha_no(&pilhano);
-               pop(&tabelaSimbolos, procedimentoAtual->numero_variaveis + procedimentoAtual->numero_procedimentos);
-               char dmem[1000];
+             	geraCodigo (NULL, "INPP");
+            	char * RotInicioSubrotina = cria_rotulo(rotulo_print);
+				rotulo_print++;
+				push_pilha_rotulo(&pilha_rotulos, RotInicioSubrotina);
+				procedimentoAtual = cria_variavel_procedure("main", RotInicioSubrotina, 0, 0);
+				push(&tabelaSimbolos, procedimentoAtual);
+				push_pilha_no(&pilhano, procedimentoAtual);
+			}
+            PROGRAM IDENT parametros_ou_vazio PONTO_E_VIRGULA
+            bloco PONTO {
+				procedimentoAtual = pop_pilha_no(&pilhano);
+            	pop(&tabelaSimbolos, procedimentoAtual->numero_variaveis + procedimentoAtual->numero_procedimentos);
+            	char dmem[1000];
 
-               sprintf(dmem, "DMEM %d", procedimentoAtual->numero_variaveis);
-               geraCodigo(NULL, dmem);
-               geraCodigo (NULL, "PARA");
-             }
+            	sprintf(dmem, "DMEM %d", procedimentoAtual->numero_variaveis);
+            	geraCodigo(NULL, dmem);
+            	geraCodigo (NULL, "PARA");
+            }
 ;
 
-parametros_ou_vazio:
-	parametros
-	| comando_vazio
-;
+parametros_ou_vazio:parametros| comando_vazio;
 
-parametros:
-	ABRE_PARENTESES lista_idents FECHA_PARENTESES
+parametros: ABRE_PARENTESES lista_idents FECHA_PARENTESES
 ;
 
 tipo:
-	INTEGER { seta_tipos(&tabelaSimbolos, integer, novas_variaveis); }
+	INTEGER {
+		seta_tipos(&tabelaSimbolos, integer, novas_variaveis);
+	}
 ;
 
 
 
 bloco       :
-        parte_declara_vars
-				{
-					char rotsaida[100];
-      		sprintf(rotsaida, "DSVS %s", pega_rotulo(&pilha_rotulos,0));
-					geraCodigo(NULL, rotsaida);
-				}
-			  parte_declara_sub_rotinas
-			  {
-				char rotsaida[100];
+        parte_declara_vars {
+			char rotsaida[100];
+			sprintf(rotsaida, "DSVS %s", pega_rotulo(&pilha_rotulos,0));
+			geraCodigo(NULL, rotsaida);
+		}
+		parte_declara_sub_rotinas {
+			char rotsaida[100];
      		sprintf(rotsaida, "%s", pega_rotulo(&pilha_rotulos,0));
      		geraCodigo(rotsaida, "NADA");
-				}
+		}
         comando_composto
 ;
 
 parte_declara_vars:  var {
-    char amem[100];
+    	char amem[100];
 		sprintf(amem, "AMEM %d", numero_variaveis);
 		atualiza_num_variaveis(&tabelaSimbolos, numero_variaveis, nivel_lexico);
 		geraCodigo(NULL, amem);
 }
 ;
 
-parte_declara_sub_rotinas:
-	parte_declara_sub_rotinas {} opcoes_sub_rotinas
+parte_declara_sub_rotinas: parte_declara_sub_rotinas opcoes_sub_rotinas
 	| comando_vazio
 ;
 
 opcoes_sub_rotinas:
-	declaracao_procedimento {atualiza_num_procedimentos(&tabelaSimbolos, nivel_lexico);} PONTO_E_VIRGULA
-	| declaracao_funcao {atualiza_num_procedimentos(&tabelaSimbolos, nivel_lexico);} PONTO_E_VIRGULA
+	declaracao_procedimento {
+		atualiza_num_procedimentos(&tabelaSimbolos, nivel_lexico);
+	} PONTO_E_VIRGULA
+	| declaracao_funcao {
+		atualiza_num_procedimentos(&tabelaSimbolos, nivel_lexico);
+	} PONTO_E_VIRGULA
 	| comando_vazio
 ;
 
@@ -127,19 +117,17 @@ declara_vars: declara_vars declara_var
 ;
 
 declara_var : {
-              novas_variaveis = 0;
-}
-              lista_id_var DOIS_PONTOS
-              tipo
-              {
+        		novas_variaveis = 0;
+			}
+            lista_id_var DOIS_PONTOS
+        	tipo {
                 numero_variaveis += novas_variaveis;
-              }
-              PONTO_E_VIRGULA
+            }
+            PONTO_E_VIRGULA
 ;
 
 
-lista_id_var: lista_id_var VIRGULA IDENT
-              { /* insere �ltima vars na tabela de s�mbolos */
+lista_id_var: lista_id_var VIRGULA IDENT { /* insere �ltima vars na tabela de s�mbolos */
                 novas_variaveis++;
                 novaEntrada = cria_variavel_simples(token, nivel_lexico, deslocamento);
                 push(&tabelaSimbolos, novaEntrada);
@@ -300,9 +288,7 @@ declaracao_funcao:
   }
 ;
 
-parametros_formais_vazio:
-	parametros_formais
-	| comando_vazio;
+parametros_formais_vazio: parametros_formais| comando_vazio;
 ;
 
 parametros_formais:
@@ -310,7 +296,6 @@ ABRE_PARENTESES { numero_parametros = 0; }
 	lista_parametros_formais
 	FECHA_PARENTESES
 	{
-
 		atualiza_parametros(pega_posicao(&tabelaSimbolos, numero_parametros),
 								&tabelaSimbolos, numero_parametros);
 	}
@@ -593,10 +578,10 @@ fator:
 			}
 			else {
 				char comando[100];
-				int cur_params = entra_procedimento == 2 ?
+				int param_atual = entra_procedimento == 2 ?
 												(procedimentoAtual->numero_parametros - numero_parametros_chamada + 1) : novos_param;
 				int passagem = entra_procedimento == 0 ? variavel_carregada->passagem :
-																				 procedimentoAtual->params[procedimentoAtual->numero_parametros - cur_params].passagem;
+																				 procedimentoAtual->params[procedimentoAtual->numero_parametros - param_atual].passagem;
 
 				if (passagem == VALOR || (passagem == REFERENCIA && entra_procedimento == 1 && variavel_carregada->passagem == REFERENCIA))
 					sprintf(comando, "CRVL %d, %d", variavel_carregada->nivel_lexico, variavel_carregada->deslocamento);
@@ -656,7 +641,6 @@ fator:
 	}
 	| numero
 	| ABRE_PARENTESES expressao FECHA_PARENTESES
-	| NOT fator
 ;
 
 atribuicao_procedimento:
