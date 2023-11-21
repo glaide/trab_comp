@@ -459,28 +459,43 @@ lista_fator:
 fator: numero | variavel {
       if(carregada != NULL) {
 			printf("variavel carregada: %s\n", carregada->rotulo);
+         // verifica se é funcao
 			if(carregada->categoria == funcao) {
 				char chamaProcedure[100];
 				sprintf(chamaProcedure, "CHPR %s, %d", carregada->rotulo, nivel_lexico);
 				geraCodigo(NULL, chamaProcedure);
 
 			}
+         // se nao é funcao, faz CRVL, CRVI ou CREN
 			else {
-				char comando[100];
-				int numero_parametros = esta_no_procedimento == 2 ?
-												(procedimento_atual->numero_parametros - qnt_var_parametro + 1) : qnt_novas_var_parametro;
-				int passagem_parametro = esta_no_procedimento == 0 ? carregada->passagem_parametro :
-																				 procedimento_atual->parametros[procedimento_atual->numero_parametros - numero_parametros].tipo_passado;
-            int eh_ref_carregada= (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && carregada->passagem_parametro == REFERENCIA);
-				if (passagem_parametro == VALOR || eh_ref_carregada)
-					sprintf(comando, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+			char comando[100];
+         int numero_parametros, passagem_parametro, eh_ref_carregada;
 
-				else if (esta_no_procedimento >= 1 && passagem_parametro == REFERENCIA)
+         if (esta_no_procedimento == 2) {
+            numero_parametros = procedimento_atual->numero_parametros - qnt_var_parametro + 1;
+         } else {
+            numero_parametros = qnt_novas_var_parametro;
+         }
+
+         if (esta_no_procedimento == 0) {
+            passagem_parametro = carregada->passagem_parametro;
+         } else {
+            passagem_parametro = procedimento_atual->parametros[procedimento_atual->numero_parametros - numero_parametros].tipo_passado;
+         }
+
+         eh_ref_carregada = (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && carregada->passagem_parametro == REFERENCIA);
+
+         if (passagem_parametro == VALOR || eh_ref_carregada) {
+            sprintf(comando, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+         } else if (esta_no_procedimento >= 1 && passagem_parametro == REFERENCIA) {
             sprintf(comando, "CREN %d, %d", carregada->nivel_lexico, carregada->deslocamento);
-				else
-					sprintf(comando, "CRVI %d, %d", carregada->nivel_lexico, carregada->deslocamento);
-				carregada = NULL;
-				geraCodigo(NULL, comando);
+         } else {
+            sprintf(comando, "CRVI %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+         }
+
+         carregada = NULL;
+         geraCodigo(NULL, comando);
+
 			}
       }
       else {
@@ -491,18 +506,28 @@ fator: numero | variavel {
 				geraCodigo(NULL, chamaProcedure);
 			}
 			else {
-				char comando[100];
-				int passagem_parametro = esta_no_procedimento == 0 ? destino->passagem_parametro :
-									procedimento_atual->parametros[procedimento_atual->numero_parametros - qnt_novas_var_parametro].tipo_passado;
-            int eh_ref =(passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && destino->passagem_parametro == REFERENCIA);
-				if (passagem_parametro == VALOR || eh_ref)
-					sprintf(comando, "CRVL %d, %d", destino->nivel_lexico, destino->deslocamento);
-				else if (esta_no_procedimento == 1 && passagem_parametro == REFERENCIA)
-					sprintf(comando, "CREN %d, %d", destino->nivel_lexico, destino->deslocamento);
-				else
-					sprintf(comando, "CRVI %d, %d", destino->nivel_lexico, destino->deslocamento);
-				destino = NULL;
-				geraCodigo(NULL, comando);
+            char comando[100];
+            int passagem_parametro, eh_ref;
+
+            if (esta_no_procedimento == 0) {
+               passagem_parametro = destino->passagem_parametro;
+            } else {
+               passagem_parametro = procedimento_atual->parametros[procedimento_atual->numero_parametros - qnt_novas_var_parametro].tipo_passado;
+            }
+
+            eh_ref = (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && destino->passagem_parametro == REFERENCIA);
+
+            if (passagem_parametro == VALOR || eh_ref) {
+               sprintf(comando, "CRVL %d, %d", destino->nivel_lexico, destino->deslocamento);
+            } else if (esta_no_procedimento == 1 && passagem_parametro == REFERENCIA) {
+               sprintf(comando, "CREN %d, %d", destino->nivel_lexico, destino->deslocamento);
+            } else {
+               sprintf(comando, "CRVI %d, %d", destino->nivel_lexico, destino->deslocamento);
+            }
+
+            destino = NULL;
+            geraCodigo(NULL, comando);
+
 			}
 		}
 };
