@@ -244,7 +244,7 @@ else { simbolo = simb_else;
           IMPRIME(" ident  ");
           return IDENT;
         }
- procedure { simbolo = simb_procedure;
+procedure { simbolo = simb_procedure;
            strncpy (token, yytext, TAM_TOKEN);
            IMPRIME("procedure da glaide");
            return PROCEDURE;
