@@ -1,22 +1,17 @@
-program teste (input, output);
-var m, n, s : integer;
+program exemplo3 (input, output);
+var z, t :  integer;
+   procedure g(t : integer);
+   var x :  integer;
+   begin
+      t:=2*t;
+      x:=2*t;
+      z:=x+1
+   end;
 begin
-   read(m,n);
-   s:=0;
-    if m>n then
-      begin
-         while m>=n do
-            begin
-               s:=s+m;
-               m:=m-1;
-            end;
-      end
-    else
-      begin
-         while m<=n do
-            begin
-               s:=s+m;
-               m:=m+1;
-            end;
-      end;
+   z:=3;
+   t:=4;
+   g(t); write (z,t);
+   g(z); write (z,t);
+   g(t+z); write (z,t);
+   g(7); write (z,t)
 end.

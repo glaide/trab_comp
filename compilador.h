@@ -48,6 +48,7 @@ typedef enum simbolos
   simb_then,
   simb_else,
   simb_if,
+  simb_procedure,
 } simbolos;
 
 /* -------------------------------------------------------------------

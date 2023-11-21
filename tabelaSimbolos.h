@@ -54,7 +54,7 @@ typedef struct type_infos_tabela_simbolos
     type_passagem_parametro passagem_parametro; // valor ou referencia
     type_param_desc *parametros;                // vetor de parametros formais
     // possiveis outros campos: numero de parametros, numero de procedimentos, numero de funcoes (se necessario)
-    int numero_parametros, numero_procedimentos, numero_funcoes;
+    int numero_parametros, numero_procedimentos;
     struct type_infos_tabela_simbolos *prox; // ponteiro para proximo elemento da tabela de simbolos
 
 } type_infos_tabela_simbolos;
@@ -80,11 +80,15 @@ type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador,
 // void adicionar_elemento_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
 //   Virou push_tabela_simbolos
 void push_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simbolos *infos);
+void pop_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, int qnt);
 void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha);
+// type_infos_tabela_simbolos pega_topo(TypeTabelaSimbolosPilha *pilha);
 void imprime_tabela_simbolos_topo(type_infos_tabela_simbolos *aux);
 void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico);
+void atualizaNumeroParametros(type_infos_tabela_simbolos *infos, TypeTabelaSimbolosPilha *p, int vars);
 void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n);
 type_infos_tabela_simbolos *busca_tabela_simbolos(TypeTabelaSimbolosPilha *tabela_simbolos, char *identificador);
+type_infos_tabela_simbolos *pega_posicao(TypeTabelaSimbolosPilha *tabela_simbolos, int posicao);
 
 // ---------------------------------------//
 

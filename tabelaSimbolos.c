@@ -43,7 +43,7 @@ type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador,
     infosVariavel->numero_parametros = totalParametros;
 
     infosVariavel->prox = NULL;
-    infosVariavel->numero_funcoes = 0;
+    infosVariavel->qnt_variaveis = 0;
     infosVariavel->numero_procedimentos = 0;
     infosVariavel->rotulo = (char *)malloc(strlen(rotulo) * sizeof(char));
     strcpy(infosVariavel->rotulo, rotulo);
@@ -58,10 +58,34 @@ void push_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, type_infos_tabela_simb
     infos->prox = pilha->topo;
     pilha->topo = infos;
     pilha->tamanho_pilha++;
-    printf("simbolo inserido %s", infos->identificador);
-    printf("Tamanho atual da pilha: %d", pilha->tamanho_pilha);
+}
+void pop_tabela_simbolos(TypeTabelaSimbolosPilha *pilha, int qnt)
+{
+    if (pilha->tamanho_pilha == 0)
+    {
+        printf("Pilha vazia!");
+        exit(1);
+    }
+    type_infos_tabela_simbolos *aux;
+    int i = 0;
+    while (i < qnt)
+    {
+        aux = pilha->topo;
+        pilha->topo = aux->prox;
+        free(aux);
+        pilha->tamanho_pilha--;
+    }
 }
 
+// type_infos_tabela_simbolos pega_topo(TypeTabelaSimbolosPilha *pilha)
+// {
+//     if (pilha->tamanho_pilha == 0)
+//     {
+//         printf("Pilha vazia!");
+//         exit(1);
+//     }
+//     return pilha->topo;
+// }
 void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha)
 {
     type_infos_tabela_simbolos *aux = pilha->topo;
@@ -107,20 +131,70 @@ type_infos_tabela_simbolos *busca_tabela_simbolos(TypeTabelaSimbolosPilha *tabel
     }
     return NULL;
 }
+
+type_infos_tabela_simbolos *pega_posicao(TypeTabelaSimbolosPilha *tabela_simbolos, int posicao)
+{
+    if (tabela_simbolos->tamanho_pilha == 0)
+    {
+        printf("Pilha vazia!");
+        exit(1);
+    }
+    type_infos_tabela_simbolos *aux = tabela_simbolos->topo;
+    int i = 0;
+    while (i < posicao)
+    {
+        aux = aux->prox;
+        i++;
+    }
+    return aux;
+}
+
 void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico)
 {
-
     type_infos_tabela_simbolos *aux = p->topo;
     while (aux->nivel_lexico != nivel_lexico)
     {
         aux = aux->prox;
     }
-    while (aux->categoria != funcao && aux->categoria != procedimento && aux->prox->prox != NULL)
+    while (aux->categoria != procedimento && aux->categoria != funcao)
     {
         aux = aux->prox;
     }
-
     aux->qnt_variaveis = vars;
+}
+void atualizaNumeroParametros(type_infos_tabela_simbolos *infos, TypeTabelaSimbolosPilha *p, int vars)
+{
+
+    if (p->tamanho_pilha == 0)
+    {
+        printf("Pilha vazia!");
+        exit(1);
+    }
+    if (p->tamanho_pilha < vars)
+    {
+        printf("Quantidade de variaveis declaradas maior que o tamanho da pilha!");
+        exit(1);
+    }
+    infos->numero_parametros = vars;
+    infos->parametros = (type_param_desc *)malloc(vars * sizeof(type_param_desc));
+    type_infos_tabela_simbolos *aux = p->topo;
+    int i = 0;
+    while (i < vars)
+    {
+        infos->parametros[i].identificador = (char *)malloc((strlen(aux->identificador) + 1) * sizeof(char));
+        strcpy(infos->parametros[i].identificador, aux->identificador);
+        infos->parametros[i].tipo = aux->type;
+        infos->parametros[i].tipo_passado = aux->passagem_parametro;
+        aux->deslocamento = -4 - i;
+        aux = aux->prox;
+        i++;
+    }
+    //   verificar se é funcao
+    if (infos->categoria == funcao)
+    {
+        infos->deslocamento -= 2;
+    }
+    aux->numero_parametros = vars;
 }
 
 void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n)

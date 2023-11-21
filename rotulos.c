@@ -20,7 +20,7 @@ void push_tabela_rotulos(pilha_rotulo *pilha, char *rotulo)
     pilha->tamanho++;
 }
 
-void pop_tabela_rotulos(pilha_rotulo *pilha, int tam_remover)
+void pop_pilha_rotulos(pilha_rotulo *pilha, int tam_remover)
 {
     if (pilha->tamanho == 0)
     {

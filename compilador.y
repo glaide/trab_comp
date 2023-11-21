@@ -14,15 +14,16 @@
 
 
 int num_vars = 0;
-int novasVariaveis, deslocamento, nivel_lexico, esta_no_procedimento, qnt_var_parametro, qnt_novas_var_parametro;
 int num_Rotulos=0;
+int novasVariaveis, deslocamento, nivel_lexico, esta_no_procedimento, qnt_var_parametro, qnt_parametros, aux_var, qnt_novos_parametros;
 TypeTabelaSimbolosPilha tabela_simbolos;
 type_infos_tabela_simbolos *nova_entrada, *procedimento_atual, *destino, *carregada, *procedimento_atual;
 char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
-pilha_Tipo tabelaTipo;
+pilha_Tipo pilha_tipo;
 
 char sinal_da_comparacao[100];
+char printRotuloProcedimento[100];
 
 %}
 
@@ -74,6 +75,7 @@ bloco       : //TODO: rever todo esse bloco
                rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "DSVS %s", rotuloAtual);
                geraCodigo(NULL, rotuloPrint);
+               printf("caiu no bloco\n");
               }
               parte_declara_sub_rotinas
               {
@@ -93,33 +95,32 @@ parte_declara_vars:  var {
 		atualizaNumeroVariaveis(&tabela_simbolos, num_vars, nivel_lexico);
 		geraCodigo(NULL, amem);
 }
-
 ;
 
 
 var         :  VAR declara_vars
-            | declara_var
+            | declara_vars
 ;
 
-declara_vars: declara_vars declara_var
-            | declara_var
+declara_vars: declara_vars declara_var {
+   printf("caiu no declara_vars\n");
+}
+            | declara_var {
+   printf("caiu no declara_var\n");
+            }
 ;
 
 /* regra 11 */
 /* pode ter mais de uma subrotila */
-parte_declara_sub_rotinas: parte_declara_sub_rotinas {
-
-
-}
+parte_declara_sub_rotinas: parte_declara_sub_rotinas
 regra_sub_rotina | nada;
 
 regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
 
 /* regra 12 */
-declara_procedimento: PROCEDURE IDENT
-{
+declara_procedimento: PROCEDURE  IDENT
 
-//TODO: implementar
+{
    nivel_lexico++;
    // cria os rotulos de entrada e saida do procedimento, e add eles na pilha de rotulos
    char *entraProcedimento = cria_rotulo(num_Rotulos);
@@ -129,25 +130,52 @@ declara_procedimento: PROCEDURE IDENT
    char *saiProcedimento = cria_rotulo(num_Rotulos);
    num_Rotulos++;
    push_tabela_rotulos(&pilhaRotulo, saiProcedimento);
-
    //faz a impressao do mepa
    char printRotuloEntrada[100];
    sprintf(printRotuloEntrada, "ENPR %d", nivel_lexico);
 	geraCodigo(pega_rotulo(&pilhaRotulo, 2), printRotuloEntrada);
+
    // TODO: criar tipo de variavel para procedimento e add na tabela de simbolos
    nova_entrada=criaVariavelSimplesProcedimento(token,nivel_lexico, 0, entraProcedimento);
    push_tabela_simbolos(&tabela_simbolos, nova_entrada);
-
-
    procedimento_atual = nova_entrada;
+   qnt_novos_parametros = 0;
+} parametros_formais_ou_nada PONTO_E_VIRGULA {
+   // salva o numero atual de variaveis
+   	aux_var = num_vars;
+		num_vars = 0;
+		deslocamento = 0;
+} bloco {
+   char printRotuloSaida[100];
+   pop_tabela_simbolos(&tabela_simbolos, procedimento_atual->qnt_variaveis);
+	sprintf(printRotuloSaida, "DMEM %d", procedimento_atual->qnt_variaveis);
+	geraCodigo(NULL, printRotuloSaida);
+   pop_tabela_simbolos(&tabela_simbolos, procedimento_atual->numero_parametros);
 
-} parametros_formais_ou_nada PONTO_E_VIRGULA bloco;
+	sprintf(printRotuloSaida, "RTPR %d, %d", nivel_lexico, procedimento_atual->numero_parametros);
+   geraCodigo(NULL, printRotuloSaida);
+   qnt_novos_parametros = 0;
+   // saiu do procedimento
+   nivel_lexico--;
+   num_vars = aux_var;
+   pop_pilha_rotulos(&pilhaRotulo, 2);
+
+};
 
 parametros_formais_ou_nada: parametros_formais | nada;
 
 /* regra 14 */
-parametros_formais: ABRE_PARENTESES parametros_formais PONTO_E_VIRGULA secao_parametros_formais | secao_parametros_formais;
+parametros_formais: ABRE_PARENTESES {
+qnt_parametros=0;
+}
+lista_parametros_formais FECHA_PARENTESES {
+   type_infos_tabela_simbolos *aux = pega_posicao(&tabela_simbolos,qnt_parametros);
+   atualizaNumeroParametros(aux,&tabela_simbolos, qnt_parametros);
+}
 
+lista_parametros_formais:lista_parametros_formais PONTO_E_VIRGULA secao_parametros_formais {
+qnt_novos_parametros++;
+} | secao_parametros_formais;
 /* regra 15 */
 /* <seção de parâmetros formais> =::
 [var] <lista de identificadores>: <identificador>
@@ -156,14 +184,40 @@ secao_parametros_formais: var_ou_nada lista_idents DOIS_PONTOS tipo;
 
 var_ou_nada: VAR | nada;
 
-/* complementar */
-/* TODO: implementar */
-/* declara_funcao: nada; */
+comando_chama_procedimento: {
+   printf("chamou procedimento\n");
+   esta_no_procedimento = 1;
+   procedimento_atual = destino;
+
+	sprintf(printRotuloProcedimento, "CHPR %s, %d", destino->rotulo, nivel_lexico);
+
+} ABRE_PARENTESES {
+   qnt_novos_parametros=0;
+} expressoes_ou_nada FECHA_PARENTESES {
+   esta_no_procedimento = 0;
+   geraCodigo(NULL, printRotuloProcedimento);
+   destino = NULL;
+
+}|
+{
+   procedimento_atual = destino;
+   sprintf(printRotuloProcedimento, "CHPR %s, %d", destino->rotulo, nivel_lexico);
+	geraCodigo(NULL, printRotuloProcedimento);
+   destino = NULL;
+};
+
+expressoes_ou_nada: expressoes | nada;
+
+expressoes: expressoes | expressao{
+   qnt_var_parametro++;
+} VIRGULA expressoes;
+
 
 
 /* regra 9 */
 declara_var : {
    novasVariaveis= 0;
+   printf("caiu no declara_var\n");
 }
               lista_id_var DOIS_PONTOS
               tipo
@@ -180,12 +234,16 @@ declara_var : {
 tipo        : INTEGER {
 
    setaTipo(&tabela_simbolos, integer, novasVariaveis);
+   printf("caiu no integer\n");
 }
 /* TODO: colocar o tipo que será salvo na tabela de simbolos */
 ;
 
 /* regra 10 conta quantas variaveis tem */
 lista_id_var: lista_id_var VIRGULA IDENT
+{
+   printf("caiu no 1\n");
+}
               { /* insere ultima vars na tabela de s�mbolos */
                novasVariaveis++;
                //  add na tabela de simbolos
@@ -197,6 +255,8 @@ lista_id_var: lista_id_var VIRGULA IDENT
                //  no futuro setar o valor de deslocamento tb
                 }
             | IDENT { /* insere vars na tabela de s�mbolos */
+   printf("caiu no 2\n");
+
                novasVariaveis++;
                nova_entrada = criaVariavelSimples(token,nivel_lexico,deslocamento);
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
@@ -204,9 +264,17 @@ lista_id_var: lista_id_var VIRGULA IDENT
                }
 ;
 
-lista_idents: lista_idents VIRGULA IDENT
+lista_idents: lista_idents VIRGULA IDENT {
+   qnt_parametros++;
+   printf("caiu no 3\n");
+
+}
 //aqui entram os parametros formais
-            | IDENT
+            | IDENT{
+   printf("caiu no 4\n");
+
+               qnt_parametros++;
+            }
 ;
 
 /* regra 16 */
@@ -236,7 +304,8 @@ comando_sem_rotulo: comando_atribuicao
                   | comando_while
                   | read
                   | write
-                  | nada;
+                  | nada
+                  | comando_chama_procedimento;
 
 read: READ ABRE_PARENTESES lista_leitura FECHA_PARENTESES;
 
@@ -246,6 +315,8 @@ lista_leitura:
 simbolo_leitura:
 	IDENT
 	{
+   printf("caiu no 5\n");
+
 		geraCodigo(NULL, "LEIT");
 		destino = busca_tabela_simbolos(&tabela_simbolos, token);
 		if(destino == NULL) {
@@ -274,7 +345,7 @@ comando_atribuicao: variavel ATRIBUICAO expressao
 {
 
 
-		verifica_tipo(&tabelaTipo, "atribuicao");
+		verifica_tipo(&pilha_tipo, "atribuicao");
 		char printARM[100];
       // verifica o tipo de passagem de parametro
       printf("passagem de parametro %d\n", destino->passagem_parametro);
@@ -289,6 +360,8 @@ comando_atribuicao: variavel ATRIBUICAO expressao
 /* regra 30 */
 
 variavel: IDENT {
+   printf("caiu no 6\n");
+
    if (destino == NULL) {
          printf("Variavel nao declarada: %s\n", token);
          destino = busca_tabela_simbolos(&tabela_simbolos, token);
@@ -298,7 +371,7 @@ variavel: IDENT {
             exit(1);
          }
 
-         push_pilha_Tipo(&tabelaTipo, destino->type);
+         push_pilha_Tipo(&pilha_tipo, destino->type);
 
    }
    else
@@ -310,13 +383,13 @@ variavel: IDENT {
 
          exit(1);
       }
-      push_pilha_Tipo(&tabelaTipo, carregada->type);
+      push_pilha_Tipo(&pilha_tipo, carregada->type);
    }
 }
 numero: NUMERO {
 	//TODO: add na tabela de tipos
 
-		push_pilha_Tipo(&tabelaTipo, integer);
+		push_pilha_Tipo(&pilha_tipo, integer);
 
 	    char totalVars[100];
 		sprintf(totalVars, "CRCT %s", token);
@@ -355,7 +428,7 @@ comando_while: WHILE {
 		sprintf(rot, "%s", rotuloAtual);
 		geraCodigo(rot, "NADA");
 
-		pop_tabela_rotulos(&pilhaRotulo, 2);
+		pop_pilha_rotulos(&pilhaRotulo, 2);
    };
 
 
@@ -365,7 +438,7 @@ comando_if:
          char rot[100];
          rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
 		   geraCodigo(rotuloAtual, "NADA");
-		   pop_tabela_rotulos(&pilhaRotulo, 2);
+		   pop_pilha_rotulos(&pilhaRotulo, 2);
        };
 
 if_then: IF {
@@ -400,7 +473,9 @@ cond_else:
       } comando_sem_rotulo | nada;
 
 /* regra 25 */
-expressao: expressao_simples relacao_expressao_simples;
+expressao:{
+   qnt_novos_parametros++;
+} expressao_simples relacao_expressao_simples;
 
 
 relacao_expressao_simples: relacao expressao_simples {
@@ -440,23 +515,22 @@ mais_ou_menos: SOMA | SUBTRACAO | nada {
 }  ;
 
 /* regra 28 */
-/* <fator> {(*|div|and) <fator> } */
 termo: termo lista_fator| fator {
 
 };
 
 lista_fator:
 	MULTIPLICACAO fator {
-		verifica_tipo(&tabelaTipo, "multiplicacao");
+		verifica_tipo(&pilha_tipo, "multiplicacao");
 		geraCodigo(NULL, "MULT");}
 	| DIVISAO fator {
-		verifica_tipo(&tabelaTipo, "divisao");
+		verifica_tipo(&pilha_tipo, "divisao");
 		geraCodigo(NULL, "DIVI"); }
 	| DIV fator {
-		verifica_tipo(&tabelaTipo, "div");
+		verifica_tipo(&pilha_tipo, "div");
 		geraCodigo(NULL, "DIVI"); }
 	| AND fator {
-		verifica_tipo(&tabelaTipo, "and");
+		verifica_tipo(&pilha_tipo, "and");
 		geraCodigo(NULL, "CONJ"); }
 ;
 /* regra 29 */
@@ -472,33 +546,33 @@ fator: numero | variavel {
 			}
          // se nao é funcao, faz CRVL, CRVI ou CREN
 			else {
-			char comando[100];
-         int numero_parametros, passagem_parametro, eh_ref_carregada;
+            char comando[100];
+            int num_proc, passagem_parametro, eh_ref_carregada;
 
-         if (esta_no_procedimento == 2) {
-            numero_parametros = procedimento_atual->numero_parametros - qnt_var_parametro + 1;
-         } else {
-            numero_parametros = qnt_novas_var_parametro;
-         }
+            if (esta_no_procedimento == 2) {
+               num_proc = procedimento_atual->numero_parametros - qnt_var_parametro + 1;
+            } else {
+               num_proc = qnt_novos_parametros;
+            }
 
-         if (esta_no_procedimento == 0) {
-            passagem_parametro = carregada->passagem_parametro;
-         } else {
-            passagem_parametro = procedimento_atual->parametros[procedimento_atual->numero_parametros - numero_parametros].tipo_passado;
-         }
+            if (esta_no_procedimento == 0) {
+               passagem_parametro = carregada->passagem_parametro;
+            } else {
+               passagem_parametro = procedimento_atual->parametros[procedimento_atual->numero_parametros - num_proc].tipo_passado;
+            }
 
-         eh_ref_carregada = (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && carregada->passagem_parametro == REFERENCIA);
+            eh_ref_carregada = (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && carregada->passagem_parametro == REFERENCIA);
 
-         if (passagem_parametro == VALOR || eh_ref_carregada) {
-            sprintf(comando, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
-         } else if (esta_no_procedimento >= 1 && passagem_parametro == REFERENCIA) {
-            sprintf(comando, "CREN %d, %d", carregada->nivel_lexico, carregada->deslocamento);
-         } else {
-            sprintf(comando, "CRVI %d, %d", carregada->nivel_lexico, carregada->deslocamento);
-         }
+            if (passagem_parametro == VALOR || eh_ref_carregada) {
+               sprintf(comando, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+            } else if (esta_no_procedimento >= 1 && passagem_parametro == REFERENCIA) {
+               sprintf(comando, "CREN %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+            } else {
+               sprintf(comando, "CRVI %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+            }
 
-         carregada = NULL;
-         geraCodigo(NULL, comando);
+            carregada = NULL;
+            geraCodigo(NULL, comando);
 
 			}
       }
@@ -516,7 +590,7 @@ fator: numero | variavel {
             if (esta_no_procedimento == 0) {
                passagem_parametro = destino->passagem_parametro;
             } else {
-               passagem_parametro = procedimento_atual->parametros[procedimento_atual->numero_parametros - qnt_novas_var_parametro].tipo_passado;
+               passagem_parametro = procedimento_atual->parametros[procedimento_atual->numero_parametros - qnt_novos_parametros].tipo_passado;
             }
 
             eh_ref = (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && destino->passagem_parametro == REFERENCIA);
@@ -541,10 +615,10 @@ expressao_mais_menos_termo:expressao_mais_menos_termo lista_e_termo | termo ; //
 lista_e_termo:
 
 	SOMA termo {
-		verifica_tipo(&tabelaTipo, "soma");
+		verifica_tipo(&pilha_tipo, "soma");
 		geraCodigo(NULL, "SOMA");}
 	| SUBTRACAO termo {
-		verifica_tipo(&tabelaTipo, "subtracao");
+		verifica_tipo(&pilha_tipo, "subtracao");
 		geraCodigo(NULL, "SUBT");}
 
 ;
@@ -575,7 +649,7 @@ int main (int argc, char** argv) {
    yyparse();
    criar_tabela_simbolos(&tabela_simbolos);
    cria_pilha_rotulo(&pilhaRotulo);
-   cria_pilha_Tipo(&tabelaTipo);
+   cria_pilha_Tipo(&pilha_tipo);
 
    return 0;
 }
