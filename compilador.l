@@ -162,21 +162,6 @@ end { simbolo = simb_end;
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 while { simbolo = simb_while;
         strncpy (token, yytext, TAM_TOKEN);
         IMPRIME("while");
@@ -228,6 +213,24 @@ write { simbolo = simb_write;
               strncpy (token, yytext, TAM_TOKEN);
               IMPRIME("write");
               return WRITE;
+}
+
+if { simbolo = simb_if;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("if");
+        return IF;
+}
+
+then { simbolo = simb_then;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("then");
+        return THEN;
+}
+
+else { simbolo = simb_else;
+        strncpy (token, yytext, TAM_TOKEN);
+        IMPRIME("else");
+        return ELSE;
 }
 
 {numero} { simbolo = simb_numero;

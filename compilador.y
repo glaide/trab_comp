@@ -22,7 +22,7 @@ char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
 pilha_Tipo tabelaTipo;
 
-char sinal_da_comparacao[10];
+char sinal_da_comparacao[100];
 
 %}
 
@@ -362,10 +362,17 @@ comando_while: WHILE {
 
 comando_if:
        if_then cond_else{
+         char rot[100];
+         rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
+		   geraCodigo(rotuloAtual, "NADA");
+		   pop_tabela_rotulos(&pilhaRotulo, 2);
+       };
 
-       }
-if_then: IF{} expressao{}
+if_then: IF {
+   printf("passou do if\n");
+}expressao
       {
+         printf("sinal da comparacao\n");
       char *inicio_If = cria_rotulo(num_Rotulos);
       num_Rotulos++;
 		char *fim_If = cria_rotulo(num_Rotulos);
@@ -390,18 +397,15 @@ cond_else:
 
          rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
 		   geraCodigo(rotuloAtual, "NADA");
-      }
+      } comando_sem_rotulo | nada;
 
 /* regra 25 */
-expressao: expressao_simples relacao_expressao_simples {
-
-};
+expressao: expressao_simples relacao_expressao_simples;
 
 
-relacao_expressao_simples: relacao expressao_simples | nada
-{
-
-};
+relacao_expressao_simples: relacao expressao_simples {
+      geraCodigo(NULL, sinal_da_comparacao);
+} | nada;
 
 /* regra 26 */
 relacao:

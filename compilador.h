@@ -44,7 +44,10 @@ typedef enum simbolos
   simb_maior_igual,
   simb_maior,
   simb_read,
-  simb_write
+  simb_write,
+  simb_then,
+  simb_else,
+  simb_if,
 } simbolos;
 
 /* -------------------------------------------------------------------
