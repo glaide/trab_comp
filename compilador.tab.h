@@ -86,8 +86,11 @@ extern int yydebug;
     NUMERO = 287,                  /* NUMERO  */
     READ = 288,                    /* READ  */
     WRITE = 289,                   /* WRITE  */
-    PROCEDURE = 290,               /* PROCEDURE  */
-    FUNCTION = 291                 /* FUNCTION  */
+    OR = 290,                      /* OR  */
+    AND = 291,                     /* AND  */
+    NOT = 292,                     /* NOT  */
+    PROCEDURE = 293,               /* PROCEDURE  */
+    FUNCTION = 294                 /* FUNCTION  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
