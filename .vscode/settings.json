@@ -1,8 +1,11 @@
 {
-    "files.associations": {
-        "tabelasimbolos.h": "c",
-        "compilador.tab.h": "c",
-        "type_traits": "c"
-    },
-    "C_Cpp.errorSquiggles": "disabled"
+  "files.associations": {
+    "tabelasimbolos.h": "c",
+    "compilador.tab.h": "c",
+    "type_traits": "c",
+    "chrono": "c",
+    "limits": "c",
+    "ratio": "c"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }

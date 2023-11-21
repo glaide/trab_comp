@@ -162,6 +162,18 @@ void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lex
         aux = aux->prox;
     }
     aux->qnt_variaveis = vars;
+    printf("Valor de aux->qnt_variaveis%d\n", aux->qnt_variaveis);
+}
+
+void atualizaNumProcedimento(TypeTabelaSimbolosPilha *p, int nivel_lexico)
+{
+    printf("entrou no atualizaNumProcedimento\n");
+    type_infos_tabela_simbolos *aux = p->topo;
+    while (aux->nivel_lexico != nivel_lexico)
+        aux = aux->prox;
+    while (aux->categoria != funcao && aux->categoria != procedimento && aux->prox->prox != NULL)
+        aux = aux->prox;
+    aux->numero_procedimentos++;
 }
 void atualizaNumeroParametros(type_infos_tabela_simbolos *infos, TypeTabelaSimbolosPilha *p, int vars)
 {
@@ -197,7 +209,29 @@ void atualizaNumeroParametros(type_infos_tabela_simbolos *infos, TypeTabelaSimbo
     }
     aux->numero_parametros = vars;
 }
+void cria_pilha_no_procedimento(pilha_no_procedimento *p)
+{
+    p->max = 8;
+    p->p = malloc(sizeof(type_infos_tabela_simbolos *) * p->max);
+    p->topo = 0;
+}
 
+void *pop_pilha_no_procedimento(pilha_no_procedimento *p)
+{
+    p->topo--;
+    return (p->p[p->topo + 1]);
+}
+
+void push_pilha_no_procedimento(pilha_no_procedimento *p, type_infos_tabela_simbolos *x)
+{
+    if (p->topo == p->max - 1)
+    {
+        p->max *= 2;
+        p->p = realloc(p->p, sizeof(type_infos_tabela_simbolos *) * p->max);
+    }
+    p->topo++;
+    p->p[p->topo] = x;
+}
 void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n)
 {
 

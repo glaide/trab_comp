@@ -21,6 +21,7 @@ type_infos_tabela_simbolos *nova_entrada, *procedimento_atual, *destino, *carreg
 char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
 pilha_Tipo pilha_tipo;
+pilha_no_procedimento pilha_no;
 
 char sinal_da_comparacao[100];
 char printRotuloProcedimento[100];
@@ -94,6 +95,10 @@ parte_declara_vars:  var {
 		sprintf(amem, "AMEM %d", num_vars);
 		atualizaNumeroVariaveis(&tabela_simbolos, num_vars, nivel_lexico);
 		geraCodigo(NULL, amem);
+
+
+
+
 }
 ;
 
@@ -115,7 +120,8 @@ declara_vars: declara_vars declara_var {
 parte_declara_sub_rotinas: parte_declara_sub_rotinas
 regra_sub_rotina | nada;
 
-regra_sub_rotina:  declara_procedimento  | nada; //TODO: implementar
+regra_sub_rotina:  declara_procedimento {atualizaNumProcedimento(&tabela_simbolos, nivel_lexico);} PONTO_E_VIRGULA
+ | nada; //TODO: implementar
 
 /* regra 12 */
 declara_procedimento: PROCEDURE  IDENT
@@ -139,6 +145,7 @@ declara_procedimento: PROCEDURE  IDENT
    nova_entrada=criaVariavelSimplesProcedimento(token,nivel_lexico, 0, entraProcedimento);
    push_tabela_simbolos(&tabela_simbolos, nova_entrada);
    procedimento_atual = nova_entrada;
+   push_pilha_no_procedimento(&pilha_no, nova_entrada);
    qnt_novos_parametros = 0;
 } parametros_formais_ou_nada PONTO_E_VIRGULA {
    // salva o numero atual de variaveis
@@ -146,6 +153,8 @@ declara_procedimento: PROCEDURE  IDENT
 		num_vars = 0;
 		deslocamento = 0;
 } bloco {
+		procedimento_atual = (type_infos_tabela_simbolos*) pop_pilha_no_procedimento(&pilha_no);
+
    char printRotuloSaida[100];
    pop_tabela_simbolos(&tabela_simbolos, procedimento_atual->qnt_variaveis);
 	sprintf(printRotuloSaida, "DMEM %d", procedimento_atual->qnt_variaveis);
@@ -650,6 +659,7 @@ int main (int argc, char** argv) {
    criar_tabela_simbolos(&tabela_simbolos);
    cria_pilha_rotulo(&pilhaRotulo);
    cria_pilha_Tipo(&pilha_tipo);
+   cria_pilha_no_procedimento(&pilha_no);
 
    return 0;
 }

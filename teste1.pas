@@ -3,9 +3,7 @@ var z, t :  integer;
    procedure g(t : integer);
    var x :  integer;
    begin
-      t:=2*t;
-      x:=2*t;
-      z:=x+1
+
    end;
 begin
    z:=3;

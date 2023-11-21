@@ -42,6 +42,7 @@ typedef struct type_param_desc
     tipo_Pascal tipo;
     type_passagem_parametro tipo_passado;
 } type_param_desc;
+
 typedef struct type_infos_tabela_simbolos
 {
     int nivel_lexico, deslocamento, qnt_variaveis; // nivel_lexico = profundidade da tabela de simbolos
@@ -58,7 +59,11 @@ typedef struct type_infos_tabela_simbolos
     struct type_infos_tabela_simbolos *prox; // ponteiro para proximo elemento da tabela de simbolos
 
 } type_infos_tabela_simbolos;
-
+typedef struct pilha_no_procedimento
+{
+    int max, topo;
+    type_infos_tabela_simbolos **p;
+} pilha_no_procedimento;
 typedef struct type_tabela_simbolos_pilha
 {
     int tamanho_pilha;
@@ -86,6 +91,10 @@ void imprime_tabela_simbolos(TypeTabelaSimbolosPilha *pilha);
 void imprime_tabela_simbolos_topo(type_infos_tabela_simbolos *aux);
 void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lexico);
 void atualizaNumeroParametros(type_infos_tabela_simbolos *infos, TypeTabelaSimbolosPilha *p, int vars);
+void cria_pilha_no_procedimento(pilha_no_procedimento *p);
+void push_pilha_no_procedimento(pilha_no_procedimento *p, type_infos_tabela_simbolos *x);
+void *pop_pilha_no_procedimento(pilha_no_procedimento *p);
+void atualizaNumProcedimento(TypeTabelaSimbolosPilha *p, int nivel_lexico);
 void setaTipo(TypeTabelaSimbolosPilha *tabela_simbolos, tipo_Pascal tipo, int n);
 type_infos_tabela_simbolos *busca_tabela_simbolos(TypeTabelaSimbolosPilha *tabela_simbolos, char *identificador);
 type_infos_tabela_simbolos *pega_posicao(TypeTabelaSimbolosPilha *tabela_simbolos, int posicao);
