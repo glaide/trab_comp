@@ -36,6 +36,12 @@ typedef struct type_param_conhecido
     type_passagem_parametro passagem_parametro;
 } type_param_conhecido; // tipo e passagem de parametro para vetor em caso de procedimento ou funcao
 
+typedef struct type_param_desc
+{
+    char *identificador;
+    tipo_Pascal tipo;
+    type_passagem_parametro tipo_passado;
+} type_param_desc;
 typedef struct type_infos_tabela_simbolos
 {
     int nivel_lexico, deslocamento, qnt_variaveis; // nivel_lexico = profundidade da tabela de simbolos
@@ -46,6 +52,7 @@ typedef struct type_infos_tabela_simbolos
     type_categoria categoria;     // variavel_simples, parametro_formal, procedimento, funcao
     // type_param_conhecido *parametros_formais; TODO: rever se necessário
     type_passagem_parametro passagem_parametro; // valor ou referencia
+    type_param_desc *parametros;                // vetor de parametros formais
     // possiveis outros campos: numero de parametros, numero de procedimentos, numero de funcoes (se necessario)
     int numero_parametros, numero_procedimentos, numero_funcoes;
     struct type_infos_tabela_simbolos *prox; // ponteiro para proximo elemento da tabela de simbolos

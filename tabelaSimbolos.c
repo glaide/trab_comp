@@ -156,12 +156,11 @@ void push_pilha_Tipo(pilha_Tipo *tabela_tipo, tipo_Pascal tipo_Pascal)
     novo->prox = tabela_tipo->topo;
     tabela_tipo->topo = novo;
     tabela_tipo->tamanho++;
-
+    printf("Tamanho atual da pilha: %d\n", tabela_tipo->tamanho);
 }
 
 tipo_Pascal pop_pilha_Tipo(pilha_Tipo *tabela_tipo)
 {
-
 
     if (tabela_tipo->tamanho == 0)
     {

@@ -14,10 +14,10 @@
 
 
 int num_vars = 0;
-int novasVariaveis, deslocamento, nivel_lexico;
+int novasVariaveis, deslocamento, nivel_lexico, esta_no_procedimento, qnt_var_parametro, qnt_novas_var_parametro;
 int num_Rotulos=0;
 TypeTabelaSimbolosPilha tabela_simbolos;
-type_infos_tabela_simbolos *nova_entrada, *procedimento_atual, *destino, *carregada;
+type_infos_tabela_simbolos *nova_entrada, *procedimento_atual, *destino, *carregada, *procedimento_atual;
 char *rotuloAtual;
 pilha_rotulo pilhaRotulo;
 pilha_Tipo tabelaTipo;
@@ -290,7 +290,7 @@ comando_atribuicao: variavel ATRIBUICAO expressao
 
 variavel: IDENT {
    if (destino == NULL) {
-
+         printf("Variavel nao declarada: %s\n", token);
          destino = busca_tabela_simbolos(&tabela_simbolos, token);
 
          if (destino == NULL) {
@@ -301,7 +301,9 @@ variavel: IDENT {
          push_pilha_Tipo(&tabelaTipo, destino->type);
 
    }
-   else {
+   else
+    {
+         printf("Variavel entrou em carregada: %s\n", token);
 
       carregada = busca_tabela_simbolos(&tabela_simbolos, token);
       if (carregada == NULL) {
@@ -455,9 +457,54 @@ lista_fator:
 ;
 /* regra 29 */
 fator: numero | variavel {
-   char printCRVL[100];
-	sprintf(printCRVL, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+      if(carregada != NULL) {
+			printf("variavel carregada: %s\n", carregada->rotulo);
+			if(carregada->categoria == funcao) {
+				char chamaProcedure[100];
+				sprintf(chamaProcedure, "CHPR %s, %d", carregada->rotulo, nivel_lexico);
+				geraCodigo(NULL, chamaProcedure);
 
+			}
+			else {
+				char comando[100];
+				int numero_parametros = esta_no_procedimento == 2 ?
+												(procedimento_atual->numero_parametros - qnt_var_parametro + 1) : qnt_novas_var_parametro;
+				int passagem_parametro = esta_no_procedimento == 0 ? carregada->passagem_parametro :
+																				 procedimento_atual->parametros[procedimento_atual->numero_parametros - numero_parametros].tipo_passado;
+            int eh_ref_carregada= (passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && carregada->passagem_parametro == REFERENCIA);
+				if (passagem_parametro == VALOR || eh_ref_carregada)
+					sprintf(comando, "CRVL %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+
+				else if (esta_no_procedimento >= 1 && passagem_parametro == REFERENCIA)
+            sprintf(comando, "CREN %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+				else
+					sprintf(comando, "CRVI %d, %d", carregada->nivel_lexico, carregada->deslocamento);
+				carregada = NULL;
+				geraCodigo(NULL, comando);
+			}
+      }
+      else {
+
+			if(destino->categoria == funcao) {
+				char chamaProcedure[100];
+				sprintf(chamaProcedure, "CHPR %s, %d", destino->rotulo, nivel_lexico);
+				geraCodigo(NULL, chamaProcedure);
+			}
+			else {
+				char comando[100];
+				int passagem_parametro = esta_no_procedimento == 0 ? destino->passagem_parametro :
+									procedimento_atual->parametros[procedimento_atual->numero_parametros - qnt_novas_var_parametro].tipo_passado;
+            int eh_ref =(passagem_parametro == REFERENCIA && esta_no_procedimento == 1 && destino->passagem_parametro == REFERENCIA);
+				if (passagem_parametro == VALOR || eh_ref)
+					sprintf(comando, "CRVL %d, %d", destino->nivel_lexico, destino->deslocamento);
+				else if (esta_no_procedimento == 1 && passagem_parametro == REFERENCIA)
+					sprintf(comando, "CREN %d, %d", destino->nivel_lexico, destino->deslocamento);
+				else
+					sprintf(comando, "CRVI %d, %d", destino->nivel_lexico, destino->deslocamento);
+				destino = NULL;
+				geraCodigo(NULL, comando);
+			}
+		}
 };
 
 expressao_mais_menos_termo:expressao_mais_menos_termo lista_e_termo | termo ; //TODO: implementar
