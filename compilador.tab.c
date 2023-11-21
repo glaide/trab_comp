@@ -617,17 +617,17 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    42,    42,    42,    57,    60,    64,    66,    72,    82,
-      71,    93,   106,   107,   110,   113,   120,   121,   123,   123,
-     124,   129,   150,   127,   174,   174,   177,   177,   185,   187,
-     192,   194,   194,   196,   203,   196,   211,   218,   227,   233,
-     227,   243,   253,   252,   266,   276,   282,   290,   292,   293,
-     297,   297,   302,   302,   304,   309,   311,   312,   313,   314,
-     315,   316,   317,   319,   322,   322,   325,   344,   348,   349,
-     353,   371,   398,   410,   423,   410,   446,   453,   456,   453,
-     474,   474,   482,   485,   485,   490,   492,   496,   499,   502,
-     505,   508,   511,   518,   518,   522,   522,   522,   527,   527,
-     532,   535,   538,   541,   546,   546,   622,   622,   626,   629
+       0,    42,    42,    42,    64,    67,    71,    73,    79,    89,
+      78,   100,   113,   114,   117,   120,   127,   128,   130,   130,
+     131,   136,   157,   134,   181,   181,   184,   184,   192,   194,
+     199,   201,   201,   203,   210,   203,   218,   225,   234,   240,
+     234,   250,   260,   259,   273,   283,   289,   297,   299,   300,
+     304,   304,   309,   309,   311,   316,   318,   319,   320,   321,
+     322,   323,   324,   326,   329,   329,   332,   351,   355,   356,
+     360,   378,   405,   417,   430,   417,   453,   460,   463,   460,
+     481,   481,   489,   492,   492,   497,   499,   503,   506,   509,
+     512,   515,   518,   525,   525,   529,   529,   529,   534,   534,
+     539,   542,   545,   548,   553,   553,   629,   629,   633,   636
 };
 #endif
 
@@ -1313,51 +1313,58 @@ yyreduce:
   case 2: /* $@1: %empty  */
 #line 42 "compilador.y"
              { //TODO: rever todo esse bloco
-             geraCodigo (NULL, "INPP");
-             char * RotInicioSubrotina = cria_rotulo(num_Rotulos);
-						 num_Rotulos++;
-						 push_tabela_rotulos(&pilhaRotulo, RotInicioSubrotina);
+                  geraCodigo (NULL, "INPP");
+                  char * RotInicioSubrotina = cria_rotulo(num_Rotulos);
+					   num_Rotulos++;
+						push_tabela_rotulos(&pilhaRotulo, RotInicioSubrotina);
+                  // trata main como um procedimento
+                  procedimento_atual = criaVariavelSimplesProcedimento("main", 0, 0, RotInicioSubrotina);
+                  push_tabela_simbolos(&tabela_simbolos, procedimento_atual);
+                  push_pilha_no_procedimento(&pilha_no, procedimento_atual);
+                  printf("caiu no programa\n");
              }
-#line 1322 "compilador.tab.c"
+#line 1327 "compilador.tab.c"
     break;
 
   case 3: /* programa: $@1 PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA bloco PONTO  */
-#line 49 "compilador.y"
+#line 54 "compilador.y"
                          {
-               char dmem[1000];
-               sprintf(dmem, "DMEM %d", num_vars);
-               geraCodigo(NULL, dmem);
-               geraCodigo (NULL, "PARA");
+               	procedimento_atual = pop_pilha_no_procedimento(&pilha_no);
+                  pop_tabela_simbolos(&tabela_simbolos, procedimento_atual->qnt_variaveis + procedimento_atual->numero_procedimentos);
+                  char dmem[1000];
+                  sprintf(dmem, "DMEM %d", num_vars);
+                  geraCodigo(NULL, dmem);
+                  geraCodigo (NULL, "PARA");
              }
-#line 1333 "compilador.tab.c"
+#line 1340 "compilador.tab.c"
     break;
 
   case 4: /* parametros_ou_nada: parametros  */
-#line 57 "compilador.y"
+#line 64 "compilador.y"
                                {
 
 }
-#line 1341 "compilador.tab.c"
+#line 1348 "compilador.tab.c"
     break;
 
   case 5: /* parametros_ou_nada: nada  */
-#line 60 "compilador.y"
+#line 67 "compilador.y"
                          {
 
                   }
-#line 1349 "compilador.tab.c"
+#line 1356 "compilador.tab.c"
     break;
 
   case 7: /* nada: %empty  */
-#line 66 "compilador.y"
+#line 73 "compilador.y"
       {
 
 }
-#line 1357 "compilador.tab.c"
+#line 1364 "compilador.tab.c"
     break;
 
   case 8: /* $@2: %empty  */
-#line 72 "compilador.y"
+#line 79 "compilador.y"
               {
                // momento em que é feita a parte do desvio
                // cria um novo rotulo
@@ -1367,22 +1374,22 @@ yyreduce:
                geraCodigo(NULL, rotuloPrint);
                printf("caiu no bloco\n");
               }
-#line 1371 "compilador.tab.c"
+#line 1378 "compilador.tab.c"
     break;
 
   case 9: /* $@3: %empty  */
-#line 82 "compilador.y"
+#line 89 "compilador.y"
               {
                char rotuloPrint[100];
                rotuloAtual = pega_rotulo(&pilhaRotulo,0);
                sprintf(rotuloPrint, "%s", rotuloAtual);
                geraCodigo(rotuloPrint, "NADA");
               }
-#line 1382 "compilador.tab.c"
+#line 1389 "compilador.tab.c"
     break;
 
   case 11: /* parte_declara_vars: var  */
-#line 93 "compilador.y"
+#line 100 "compilador.y"
                          {
       char amem[100];
 		sprintf(amem, "AMEM %d", num_vars);
@@ -1393,33 +1400,33 @@ yyreduce:
 
 
 }
-#line 1397 "compilador.tab.c"
+#line 1404 "compilador.tab.c"
     break;
 
   case 14: /* declara_vars: declara_vars declara_var  */
-#line 110 "compilador.y"
+#line 117 "compilador.y"
                                        {
    printf("caiu no declara_vars\n");
 }
-#line 1405 "compilador.tab.c"
+#line 1412 "compilador.tab.c"
     break;
 
   case 15: /* declara_vars: declara_var  */
-#line 113 "compilador.y"
+#line 120 "compilador.y"
                           {
    printf("caiu no declara_var\n");
             }
-#line 1413 "compilador.tab.c"
+#line 1420 "compilador.tab.c"
     break;
 
   case 18: /* $@4: %empty  */
-#line 123 "compilador.y"
+#line 130 "compilador.y"
                                         {atualizaNumProcedimento(&tabela_simbolos, nivel_lexico);}
-#line 1419 "compilador.tab.c"
+#line 1426 "compilador.tab.c"
     break;
 
   case 21: /* $@5: %empty  */
-#line 129 "compilador.y"
+#line 136 "compilador.y"
 {
    nivel_lexico++;
    // cria os rotulos de entrada e saida do procedimento, e add eles na pilha de rotulos
@@ -1442,22 +1449,22 @@ yyreduce:
    push_pilha_no_procedimento(&pilha_no, nova_entrada);
    qnt_novos_parametros = 0;
 }
-#line 1446 "compilador.tab.c"
+#line 1453 "compilador.tab.c"
     break;
 
   case 22: /* $@6: %empty  */
-#line 150 "compilador.y"
+#line 157 "compilador.y"
                                              {
    // salva o numero atual de variaveis
    	aux_var = num_vars;
 		num_vars = 0;
 		deslocamento = 0;
 }
-#line 1457 "compilador.tab.c"
+#line 1464 "compilador.tab.c"
     break;
 
   case 23: /* declara_procedimento: PROCEDURE IDENT $@5 parametros_formais_ou_nada PONTO_E_VIRGULA $@6 bloco  */
-#line 155 "compilador.y"
+#line 162 "compilador.y"
         {
 		procedimento_atual = (type_infos_tabela_simbolos*) pop_pilha_no_procedimento(&pilha_no);
 
@@ -1476,36 +1483,36 @@ yyreduce:
    pop_pilha_rotulos(&pilhaRotulo, 2);
 
 }
-#line 1480 "compilador.tab.c"
+#line 1487 "compilador.tab.c"
     break;
 
   case 26: /* $@7: %empty  */
-#line 177 "compilador.y"
+#line 184 "compilador.y"
                                     {
 qnt_parametros=0;
 }
-#line 1488 "compilador.tab.c"
+#line 1495 "compilador.tab.c"
     break;
 
   case 27: /* parametros_formais: ABRE_PARENTESES $@7 lista_parametros_formais FECHA_PARENTESES  */
-#line 180 "compilador.y"
+#line 187 "compilador.y"
                                           {
    type_infos_tabela_simbolos *aux = pega_posicao(&tabela_simbolos,qnt_parametros);
    atualizaNumeroParametros(aux,&tabela_simbolos, qnt_parametros);
 }
-#line 1497 "compilador.tab.c"
+#line 1504 "compilador.tab.c"
     break;
 
   case 28: /* lista_parametros_formais: lista_parametros_formais PONTO_E_VIRGULA secao_parametros_formais  */
-#line 185 "compilador.y"
+#line 192 "compilador.y"
                                                                                            {
 qnt_novos_parametros++;
 }
-#line 1505 "compilador.tab.c"
+#line 1512 "compilador.tab.c"
     break;
 
   case 33: /* $@8: %empty  */
-#line 196 "compilador.y"
+#line 203 "compilador.y"
                             {
    printf("chamou procedimento\n");
    esta_no_procedimento = 1;
@@ -1514,50 +1521,50 @@ qnt_novos_parametros++;
 	sprintf(printRotuloProcedimento, "CHPR %s, %d", destino->rotulo, nivel_lexico);
 
 }
-#line 1518 "compilador.tab.c"
+#line 1525 "compilador.tab.c"
     break;
 
   case 34: /* $@9: %empty  */
-#line 203 "compilador.y"
+#line 210 "compilador.y"
                   {
    qnt_novos_parametros=0;
 }
-#line 1526 "compilador.tab.c"
+#line 1533 "compilador.tab.c"
     break;
 
   case 35: /* comando_chama_procedimento: $@8 ABRE_PARENTESES $@9 expressoes_ou_nada FECHA_PARENTESES  */
-#line 205 "compilador.y"
+#line 212 "compilador.y"
                                       {
    esta_no_procedimento = 0;
    geraCodigo(NULL, printRotuloProcedimento);
    destino = NULL;
 
 }
-#line 1537 "compilador.tab.c"
+#line 1544 "compilador.tab.c"
     break;
 
   case 36: /* comando_chama_procedimento: %empty  */
-#line 211 "compilador.y"
+#line 218 "compilador.y"
 {
    procedimento_atual = destino;
    sprintf(printRotuloProcedimento, "CHPR %s, %d", destino->rotulo, nivel_lexico);
 	geraCodigo(NULL, printRotuloProcedimento);
    destino = NULL;
 }
-#line 1548 "compilador.tab.c"
+#line 1555 "compilador.tab.c"
     break;
 
   case 38: /* $@11: %empty  */
-#line 227 "compilador.y"
+#line 234 "compilador.y"
               {
    novasVariaveis= 0;
    printf("caiu no declara_var\n");
 }
-#line 1557 "compilador.tab.c"
+#line 1564 "compilador.tab.c"
     break;
 
   case 39: /* $@12: %empty  */
-#line 233 "compilador.y"
+#line 240 "compilador.y"
               { /* AMEM */
                // atualiza quantas variaveis tem
                num_vars+=novasVariaveis;
@@ -1565,29 +1572,29 @@ qnt_novos_parametros++;
                //para usar amem tem que saber qual deslocamento
                //TODO: implementar
               }
-#line 1569 "compilador.tab.c"
+#line 1576 "compilador.tab.c"
     break;
 
   case 41: /* tipo: INTEGER  */
-#line 243 "compilador.y"
+#line 250 "compilador.y"
                       {
 
    setaTipo(&tabela_simbolos, integer, novasVariaveis);
    printf("caiu no integer\n");
 }
-#line 1579 "compilador.tab.c"
+#line 1586 "compilador.tab.c"
     break;
 
   case 42: /* $@13: %empty  */
-#line 253 "compilador.y"
+#line 260 "compilador.y"
 {
    printf("caiu no 1\n");
 }
-#line 1587 "compilador.tab.c"
+#line 1594 "compilador.tab.c"
     break;
 
   case 43: /* lista_id_var: lista_id_var VIRGULA IDENT $@13  */
-#line 256 "compilador.y"
+#line 263 "compilador.y"
               { /* insere ultima vars na tabela de s�mbolos */
                novasVariaveis++;
                //  add na tabela de simbolos
@@ -1598,11 +1605,11 @@ qnt_novos_parametros++;
 
                //  no futuro setar o valor de deslocamento tb
                 }
-#line 1602 "compilador.tab.c"
+#line 1609 "compilador.tab.c"
     break;
 
   case 44: /* lista_id_var: IDENT  */
-#line 266 "compilador.y"
+#line 273 "compilador.y"
                     { /* insere vars na tabela de s�mbolos */
    printf("caiu no 2\n");
 
@@ -1611,55 +1618,55 @@ qnt_novos_parametros++;
                push_tabela_simbolos(&tabela_simbolos, nova_entrada);
                deslocamento++;
                }
-#line 1615 "compilador.tab.c"
+#line 1622 "compilador.tab.c"
     break;
 
   case 45: /* lista_idents: lista_idents VIRGULA IDENT  */
-#line 276 "compilador.y"
+#line 283 "compilador.y"
                                          {
    qnt_parametros++;
    printf("caiu no 3\n");
 
 }
-#line 1625 "compilador.tab.c"
+#line 1632 "compilador.tab.c"
     break;
 
   case 46: /* lista_idents: IDENT  */
-#line 282 "compilador.y"
+#line 289 "compilador.y"
                    {
    printf("caiu no 4\n");
 
                qnt_parametros++;
             }
-#line 1635 "compilador.tab.c"
+#line 1642 "compilador.tab.c"
     break;
 
   case 50: /* $@14: %empty  */
-#line 297 "compilador.y"
+#line 304 "compilador.y"
                        {
 
 }
-#line 1643 "compilador.tab.c"
+#line 1650 "compilador.tab.c"
     break;
 
   case 52: /* $@15: %empty  */
-#line 302 "compilador.y"
+#line 309 "compilador.y"
                        {
 
 }
-#line 1651 "compilador.tab.c"
+#line 1658 "compilador.tab.c"
     break;
 
   case 54: /* numero_ou_nada: nada  */
-#line 304 "compilador.y"
+#line 311 "compilador.y"
                      {
 
 }
-#line 1659 "compilador.tab.c"
+#line 1666 "compilador.tab.c"
     break;
 
   case 66: /* simbolo_leitura: IDENT  */
-#line 326 "compilador.y"
+#line 333 "compilador.y"
         {
    printf("caiu no 5\n");
 
@@ -1675,23 +1682,23 @@ qnt_novos_parametros++;
 		geraCodigo(NULL, print);
 		destino = NULL;
 	}
-#line 1679 "compilador.tab.c"
+#line 1686 "compilador.tab.c"
     break;
 
   case 68: /* lista_escrita: lista_escrita VIRGULA expressao  */
-#line 348 "compilador.y"
+#line 355 "compilador.y"
                                         { geraCodigo (NULL, "IMPR"); }
-#line 1685 "compilador.tab.c"
+#line 1692 "compilador.tab.c"
     break;
 
   case 69: /* lista_escrita: expressao  */
-#line 349 "compilador.y"
+#line 356 "compilador.y"
                     { geraCodigo (NULL, "IMPR"); }
-#line 1691 "compilador.tab.c"
+#line 1698 "compilador.tab.c"
     break;
 
   case 70: /* comando_atribuicao: variavel ATRIBUICAO expressao  */
-#line 354 "compilador.y"
+#line 361 "compilador.y"
 {
 
 
@@ -1706,11 +1713,11 @@ qnt_novos_parametros++;
 		geraCodigo(NULL, printARM);
 		destino = NULL;
 	}
-#line 1710 "compilador.tab.c"
+#line 1717 "compilador.tab.c"
     break;
 
   case 71: /* variavel: IDENT  */
-#line 371 "compilador.y"
+#line 378 "compilador.y"
                 {
    printf("caiu no 6\n");
 
@@ -1738,11 +1745,11 @@ qnt_novos_parametros++;
       push_pilha_Tipo(&pilha_tipo, carregada->type);
    }
 }
-#line 1742 "compilador.tab.c"
+#line 1749 "compilador.tab.c"
     break;
 
   case 72: /* numero: NUMERO  */
-#line 398 "compilador.y"
+#line 405 "compilador.y"
                {
 	//TODO: add na tabela de tipos
 
@@ -1752,11 +1759,11 @@ qnt_novos_parametros++;
 		sprintf(totalVars, "CRCT %s", token);
 		geraCodigo(NULL, totalVars);
 }
-#line 1756 "compilador.tab.c"
+#line 1763 "compilador.tab.c"
     break;
 
   case 73: /* $@16: %empty  */
-#line 410 "compilador.y"
+#line 417 "compilador.y"
                      {
    //Cria rotulos do inicio e fim do While e adiciona eles na pilha de rotulos
       char *inicio_while = cria_rotulo(num_Rotulos);
@@ -1770,22 +1777,22 @@ qnt_novos_parametros++;
       geraCodigo(rotuloAtual, "NADA");
 
    }
-#line 1774 "compilador.tab.c"
+#line 1781 "compilador.tab.c"
     break;
 
   case 74: /* $@17: %empty  */
-#line 423 "compilador.y"
+#line 430 "compilador.y"
    {
       char dsvf[100];
       rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
 		sprintf(dsvf, "DSVF %s", rotuloAtual);
 		geraCodigo(NULL, dsvf);
    }
-#line 1785 "compilador.tab.c"
+#line 1792 "compilador.tab.c"
     break;
 
   case 75: /* comando_while: WHILE $@16 expressao DO $@17 comando_composto  */
-#line 428 "compilador.y"
+#line 435 "compilador.y"
                       {
 
       char dsvs[100];
@@ -1800,30 +1807,30 @@ qnt_novos_parametros++;
 
 		pop_pilha_rotulos(&pilhaRotulo, 2);
    }
-#line 1804 "compilador.tab.c"
+#line 1811 "compilador.tab.c"
     break;
 
   case 76: /* comando_if: if_then cond_else  */
-#line 446 "compilador.y"
+#line 453 "compilador.y"
                         {
          char rot[100];
          rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
 		   geraCodigo(rotuloAtual, "NADA");
 		   pop_pilha_rotulos(&pilhaRotulo, 2);
        }
-#line 1815 "compilador.tab.c"
+#line 1822 "compilador.tab.c"
     break;
 
   case 77: /* $@18: %empty  */
-#line 453 "compilador.y"
+#line 460 "compilador.y"
             {
    printf("passou do if\n");
 }
-#line 1823 "compilador.tab.c"
+#line 1830 "compilador.tab.c"
     break;
 
   case 78: /* $@19: %empty  */
-#line 456 "compilador.y"
+#line 463 "compilador.y"
       {
          printf("sinal da comparacao\n");
       char *inicio_If = cria_rotulo(num_Rotulos);
@@ -1839,11 +1846,11 @@ qnt_novos_parametros++;
 		geraCodigo(NULL, rot);
 
       }
-#line 1843 "compilador.tab.c"
+#line 1850 "compilador.tab.c"
     break;
 
   case 80: /* $@20: %empty  */
-#line 474 "compilador.y"
+#line 481 "compilador.y"
           {
          char rot[100];
          rotuloAtual = pega_rotulo(&pilhaRotulo, 2);
@@ -1853,131 +1860,131 @@ qnt_novos_parametros++;
          rotuloAtual = pega_rotulo(&pilhaRotulo, 1);
 		   geraCodigo(rotuloAtual, "NADA");
       }
-#line 1857 "compilador.tab.c"
+#line 1864 "compilador.tab.c"
     break;
 
   case 83: /* $@21: %empty  */
-#line 485 "compilador.y"
+#line 492 "compilador.y"
           {
    qnt_novos_parametros++;
 }
-#line 1865 "compilador.tab.c"
+#line 1872 "compilador.tab.c"
     break;
 
   case 85: /* relacao_expressao_simples: relacao expressao_simples  */
-#line 490 "compilador.y"
+#line 497 "compilador.y"
                                                      {
       geraCodigo(NULL, sinal_da_comparacao);
 }
-#line 1873 "compilador.tab.c"
+#line 1880 "compilador.tab.c"
     break;
 
   case 87: /* relacao: IGUAL  */
-#line 496 "compilador.y"
+#line 503 "compilador.y"
               {
       strcpy(sinal_da_comparacao,"CMIG");
    }
-#line 1881 "compilador.tab.c"
+#line 1888 "compilador.tab.c"
     break;
 
   case 88: /* relacao: DIFERENTE  */
-#line 499 "compilador.y"
+#line 506 "compilador.y"
                     {
       strcpy(sinal_da_comparacao,"CMDG");
    }
-#line 1889 "compilador.tab.c"
+#line 1896 "compilador.tab.c"
     break;
 
   case 89: /* relacao: MENOR  */
-#line 502 "compilador.y"
+#line 509 "compilador.y"
                 {
       strcpy(sinal_da_comparacao,"CMME");
    }
-#line 1897 "compilador.tab.c"
+#line 1904 "compilador.tab.c"
     break;
 
   case 90: /* relacao: MENOR_IGUAL  */
-#line 505 "compilador.y"
+#line 512 "compilador.y"
                       {
       strcpy(sinal_da_comparacao,"CMEG");
    }
-#line 1905 "compilador.tab.c"
+#line 1912 "compilador.tab.c"
     break;
 
   case 91: /* relacao: MAIOR  */
-#line 508 "compilador.y"
+#line 515 "compilador.y"
            {
       strcpy(sinal_da_comparacao,"CMMA");
    }
-#line 1913 "compilador.tab.c"
+#line 1920 "compilador.tab.c"
     break;
 
   case 92: /* relacao: MAIOR_IGUAL  */
-#line 511 "compilador.y"
+#line 518 "compilador.y"
                       {
       strcpy(sinal_da_comparacao,"CMAG");
    }
-#line 1921 "compilador.tab.c"
+#line 1928 "compilador.tab.c"
     break;
 
   case 93: /* $@22: %empty  */
-#line 518 "compilador.y"
+#line 525 "compilador.y"
                                  {
 
 }
-#line 1929 "compilador.tab.c"
+#line 1936 "compilador.tab.c"
     break;
 
   case 97: /* mais_ou_menos: nada  */
-#line 522 "compilador.y"
+#line 529 "compilador.y"
                                        {
 
 }
-#line 1937 "compilador.tab.c"
+#line 1944 "compilador.tab.c"
     break;
 
   case 99: /* termo: fator  */
-#line 527 "compilador.y"
+#line 534 "compilador.y"
                                 {
 
 }
-#line 1945 "compilador.tab.c"
+#line 1952 "compilador.tab.c"
     break;
 
   case 100: /* lista_fator: MULTIPLICACAO fator  */
-#line 532 "compilador.y"
+#line 539 "compilador.y"
                             {
 		verifica_tipo(&pilha_tipo, "multiplicacao");
 		geraCodigo(NULL, "MULT");}
-#line 1953 "compilador.tab.c"
+#line 1960 "compilador.tab.c"
     break;
 
   case 101: /* lista_fator: DIVISAO fator  */
-#line 535 "compilador.y"
+#line 542 "compilador.y"
                         {
 		verifica_tipo(&pilha_tipo, "divisao");
 		geraCodigo(NULL, "DIVI"); }
-#line 1961 "compilador.tab.c"
+#line 1968 "compilador.tab.c"
     break;
 
   case 102: /* lista_fator: DIV fator  */
-#line 538 "compilador.y"
+#line 545 "compilador.y"
                     {
 		verifica_tipo(&pilha_tipo, "div");
 		geraCodigo(NULL, "DIVI"); }
-#line 1969 "compilador.tab.c"
+#line 1976 "compilador.tab.c"
     break;
 
   case 103: /* lista_fator: AND fator  */
-#line 541 "compilador.y"
+#line 548 "compilador.y"
                     {
 		verifica_tipo(&pilha_tipo, "and");
 		geraCodigo(NULL, "CONJ"); }
-#line 1977 "compilador.tab.c"
+#line 1984 "compilador.tab.c"
     break;
 
   case 105: /* fator: variavel  */
-#line 546 "compilador.y"
+#line 553 "compilador.y"
                          {
       if(carregada != NULL) {
 			printf("variavel carregada: %s\n", carregada->rotulo);
@@ -2053,27 +2060,27 @@ qnt_novos_parametros++;
 			}
 		}
 }
-#line 2057 "compilador.tab.c"
+#line 2064 "compilador.tab.c"
     break;
 
   case 108: /* lista_e_termo: SOMA termo  */
-#line 626 "compilador.y"
+#line 633 "compilador.y"
                    {
 		verifica_tipo(&pilha_tipo, "soma");
 		geraCodigo(NULL, "SOMA");}
-#line 2065 "compilador.tab.c"
+#line 2072 "compilador.tab.c"
     break;
 
   case 109: /* lista_e_termo: SUBTRACAO termo  */
-#line 629 "compilador.y"
+#line 636 "compilador.y"
                           {
 		verifica_tipo(&pilha_tipo, "subtracao");
 		geraCodigo(NULL, "SUBT");}
-#line 2073 "compilador.tab.c"
+#line 2080 "compilador.tab.c"
     break;
 
 
-#line 2077 "compilador.tab.c"
+#line 2084 "compilador.tab.c"
 
       default: break;
     }
@@ -2266,7 +2273,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 635 "compilador.y"
+#line 642 "compilador.y"
 
 
 int main (int argc, char** argv) {

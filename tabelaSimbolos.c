@@ -39,16 +39,15 @@ type_infos_tabela_simbolos *criaVariavelSimplesProcedimento(char *identificador,
     strcpy(infosVariavel->identificador, identificador);
     infosVariavel->nivel_lexico = nivelLexico;
     infosVariavel->categoria = procedimento;
-
     infosVariavel->numero_parametros = totalParametros;
 
-    infosVariavel->prox = NULL;
-    infosVariavel->qnt_variaveis = 0;
-    infosVariavel->numero_procedimentos = 0;
     infosVariavel->rotulo = (char *)malloc(strlen(rotulo) * sizeof(char));
     strcpy(infosVariavel->rotulo, rotulo);
     infosVariavel->type = desconhecido;
     infosVariavel->deslocamento = 0;
+    infosVariavel->prox = NULL;
+    infosVariavel->qnt_variaveis = 0;
+    infosVariavel->numero_procedimentos = 0;
 
     return infosVariavel;
 }
@@ -224,6 +223,7 @@ void *pop_pilha_no_procedimento(pilha_no_procedimento *p)
 
 void push_pilha_no_procedimento(pilha_no_procedimento *p, type_infos_tabela_simbolos *x)
 {
+
     if (p->topo == p->max - 1)
     {
         p->max *= 2;

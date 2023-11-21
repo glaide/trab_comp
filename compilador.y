@@ -40,17 +40,24 @@ char printRotuloProcedimento[100];
 %%
 /* regra 1 */
 programa    :{ //TODO: rever todo esse bloco
-             geraCodigo (NULL, "INPP");
-             char * RotInicioSubrotina = cria_rotulo(num_Rotulos);
-						 num_Rotulos++;
-						 push_tabela_rotulos(&pilhaRotulo, RotInicioSubrotina);
+                  geraCodigo (NULL, "INPP");
+                  char * RotInicioSubrotina = cria_rotulo(num_Rotulos);
+					   num_Rotulos++;
+						push_tabela_rotulos(&pilhaRotulo, RotInicioSubrotina);
+                  // trata main como um procedimento
+                  procedimento_atual = criaVariavelSimplesProcedimento("main", 0, 0, RotInicioSubrotina);
+                  push_tabela_simbolos(&tabela_simbolos, procedimento_atual);
+                  push_pilha_no_procedimento(&pilha_no, procedimento_atual);
+                  printf("caiu no programa\n");
              }
              PROGRAM IDENT parametros_ou_nada PONTO_E_VIRGULA
              bloco PONTO {
-               char dmem[1000];
-               sprintf(dmem, "DMEM %d", num_vars);
-               geraCodigo(NULL, dmem);
-               geraCodigo (NULL, "PARA");
+               	procedimento_atual = pop_pilha_no_procedimento(&pilha_no);
+                  pop_tabela_simbolos(&tabela_simbolos, procedimento_atual->qnt_variaveis + procedimento_atual->numero_procedimentos);
+                  char dmem[1000];
+                  sprintf(dmem, "DMEM %d", num_vars);
+                  geraCodigo(NULL, dmem);
+                  geraCodigo (NULL, "PARA");
              }
 ;
 
