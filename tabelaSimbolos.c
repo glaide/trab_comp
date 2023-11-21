@@ -156,6 +156,7 @@ void atualizaNumeroVariaveis(TypeTabelaSimbolosPilha *p, int vars, int nivel_lex
     {
         aux = aux->prox;
     }
+    printf("Valor de aux->categoria%d\n", aux->categoria);
     while (aux->categoria != procedimento && aux->categoria != funcao)
     {
         aux = aux->prox;
