@@ -238,7 +238,11 @@ integer { simbolo = simb_integer;
            IMPRIME("integer");
            return INTEGER;
 }
-
+forward  { simbolo = simb_forward;
+          strncpy (token, yytext, TAM_TOKEN);
+          IMPRIME("forward  ");
+          return T_FORWARD;
+}
 {numero} { simbolo = simb_numero;
           strncpy (token, yytext, TAM_TOKEN);
           IMPRIME(" numero  ");

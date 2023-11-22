@@ -51,7 +51,8 @@ typedef enum simbolos
   simb_fecha_colchetes,
   simb_integer,
   simb_read,
-  simb_write
+  simb_write,
+  simb_forward
 } simbolos;
 
 /* -------------------------------------------------------------------

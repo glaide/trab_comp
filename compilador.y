@@ -15,9 +15,10 @@
 int por_ref, numero_variaveis, numero_parametros, aux_var, novas_variaveis, novos_param, nivel_lexico, deslocamento,numero_parametros_chamada,entra_procedimento;
 int rotulo_print = 0;
 int subrt = 0;
+int declarado = 0;
 char comparacao[100],chama_proc[100], *funcao_atual, *rotulo_fim_subr;
 pilha_simbolos tabelaSimbolos;
-type_info_tabela_simbolos *novaEntrada, *variavelDestino, *variavel_carregada, *procedimentoAtual;
+type_info_tabela_simbolos *novaEntrada, *variavelDestino, *variavel_carregada, *procedimentoAtual, *verifica_forward;
 tipo_pilha tabelaTipo;
 pilha_rotulo pilha_rotulos;
 pilha_no pilhano;
@@ -32,7 +33,7 @@ pilha_no pilhano;
 %token MAIOR MENOR MAIOR_IGUAL MENOR_IGUAL IGUAL DIFERENTE
 %token SOMA SUBTRACAO MULTIPLICACAO DIVISAO DIV
 %token NUMERO READ WRITE
-%token PROCEDURE FUNCTION
+%token PROCEDURE FUNCTION T_FORWARD
 
 
 %%
@@ -159,26 +160,39 @@ declaracao_procedimento:
 	PROCEDURE { subrt = 1; }
 	IDENT
 	{
+		verifica_forward = busca_pilha_simbolos(&tabelaSimbolos, token);
+		if (verifica_forward==NULL){
+			// segue a vida normal
+			declarado = 0;
+			// Gera rotulos de entrada e saida
+			char *RotInicioSubrotina = cria_rotulo(rotulo_print);
+			rotulo_print++;
 
-		// Gera rotulos de entrada e saida
-		char *RotInicioSubrotina = cria_rotulo(rotulo_print);
-		rotulo_print++;
+			rotulo_fim_subr = cria_rotulo(rotulo_print);
+			rotulo_print++;
+			push_pilha_rotulo(&pilha_rotulos, RotInicioSubrotina);
+			push_pilha_rotulo(&pilha_rotulos, rotulo_fim_subr);
+			nivel_lexico++;
 
-		rotulo_fim_subr = cria_rotulo(rotulo_print);
-		rotulo_print++;
-		push_pilha_rotulo(&pilha_rotulos, RotInicioSubrotina);
-		push_pilha_rotulo(&pilha_rotulos, rotulo_fim_subr);
-		nivel_lexico++;
+			// Imprime rotulo de entrada da subrotina
+			char rotentrada[100];
+			sprintf(rotentrada, "ENPR %d", nivel_lexico);
+			geraCodigo(pega_rotulo(&pilha_rotulos, 2), rotentrada);
 
-		// Imprime rotulo de entrada da subrotina
-		char rotentrada[100];
-		sprintf(rotentrada, "ENPR %d", nivel_lexico);
-		geraCodigo(pega_rotulo(&pilha_rotulos, 2), rotentrada);
-
-		novaEntrada = cria_variavel_procedure(token, RotInicioSubrotina, nivel_lexico, 0);
-		push(&tabelaSimbolos, novaEntrada);
-		push_pilha_no(&pilhano,  novaEntrada);
-		procedimentoAtual = novaEntrada;
+			novaEntrada = cria_variavel_procedure(token, RotInicioSubrotina, nivel_lexico, 0);
+			push(&tabelaSimbolos, novaEntrada);
+			push_pilha_no(&pilhano,  novaEntrada);
+			procedimentoAtual = novaEntrada;
+		}
+		else if(verifica_forward->declarada){
+			char print[100];
+			sprintf(print,"procedimento '%s' ja foi declarado!\n",token);
+			exit(1);
+		}
+		else {
+			declarado=1;
+			procedimentoAtual = verifica_forward; //testar para ver se esta certo
+		}
 	}
 	{ novos_param = 0; } parametros_formais_vazio PONTO_E_VIRGULA
 	{
@@ -188,7 +202,7 @@ declaracao_procedimento:
 		numero_variaveis = 0;
 		deslocamento = 0;
 	}
-	bloco
+	regra_forward_ou_bloco
 	{
 		procedimentoAtual = (type_info_tabela_simbolos*) pop_pilha_no(&pilhano);
 		pop(&tabelaSimbolos, procedimentoAtual->numero_procedimentos); // Remove procedimentos da tabela de simbolos
@@ -226,29 +240,45 @@ declaracao_funcao:
   FUNCTION{ subrt = 1; }
   IDENT
   {
-
+	// indica que ainda nao foi declarado pelo forward
+	declarado = 0;
     // Gera rotulos de entrada e saida
-    char *RotInicioSubrotina = cria_rotulo(rotulo_print);
-    rotulo_print++;
 
-    rotulo_fim_subr = cria_rotulo(rotulo_print);
-    rotulo_print++;
-    push_pilha_rotulo(&pilha_rotulos, RotInicioSubrotina);
-    push_pilha_rotulo(&pilha_rotulos, rotulo_fim_subr);
-    nivel_lexico++;
+	verifica_forward = busca_pilha_simbolos(&tabelaSimbolos, token);
+	if(verifica_forward==NULL){
+		// segue a vida normal
+		char *RotInicioSubrotina = cria_rotulo(rotulo_print);
+		rotulo_print++;
 
-    // Imprime rotulo de entrada da subrotina
-    char rotentrada[100];
-    sprintf(rotentrada, "ENPR %d", nivel_lexico);
-    geraCodigo(pega_rotulo(&pilha_rotulos, 2), rotentrada);
+		rotulo_fim_subr = cria_rotulo(rotulo_print);
+		rotulo_print++;
+		push_pilha_rotulo(&pilha_rotulos, RotInicioSubrotina);
+		push_pilha_rotulo(&pilha_rotulos, rotulo_fim_subr);
+		nivel_lexico++;
+
+		// Imprime rotulo de entrada da subrotina
+		char rotentrada[100];
+		sprintf(rotentrada, "ENPR %d", nivel_lexico);
+		geraCodigo(pega_rotulo(&pilha_rotulos, 2), rotentrada);
 
 		sprintf(funcao_atual, "%s", token);
-    novaEntrada = cria_variavel_funcao(token, RotInicioSubrotina, nivel_lexico, 0, integer);
-    push(&tabelaSimbolos, novaEntrada);
-    push_pilha_no(&pilhano,  novaEntrada);
-    procedimentoAtual = novaEntrada;
+		novaEntrada = cria_variavel_funcao(token, RotInicioSubrotina, nivel_lexico, 0, integer);
+		push(&tabelaSimbolos, novaEntrada);
+		push_pilha_no(&pilhano,  novaEntrada);
+		procedimentoAtual = novaEntrada;
+		novos_param = 0;
+	}
+	else if(verifica_forward->declarada){
+		char print[100];
+		sprintf(print,"funcao '%s' ja foi declarada!\n",token);
+		exit(1);
+	}
+	else {
+		declarado=1;
+		procedimentoAtual = verifica_forward; //testar para ver se esta certo
+	}
   }
-  { novos_param = 0; } parametros_formais_vazio DOIS_PONTOS tipo PONTO_E_VIRGULA
+	parametros_formais_vazio DOIS_PONTOS tipo PONTO_E_VIRGULA
   {
     // Zera para ser utilizado na subrotina
     // Mas salva VALOR para ser recuperado
@@ -256,7 +286,7 @@ declaracao_funcao:
     numero_variaveis = 0;
     deslocamento = 0;
   }
-  bloco
+  regra_forward_ou_bloco
   {
     procedimentoAtual = (type_info_tabela_simbolos*)pop_pilha_no(&pilhano);
     pop(&tabelaSimbolos, procedimentoAtual->numero_procedimentos); // Remove procedimentos da tabela de simbolos
@@ -736,6 +766,23 @@ lista_escrita:
 	lista_escrita VIRGULA expressao { geraCodigo (NULL, "IMPR"); }
 	| expressao { geraCodigo (NULL, "IMPR"); }
 ;
+
+regra_forward_ou_bloco: T_FORWARD {
+	// verifica ja foi declarado
+	char print[100];
+	if (declarado) {
+			sprintf(print,"'%s' ja foi declarado!\n",procedimentoAtual->identificador);
+			yyerror(print); //necessario?
+			exit(1);
+	}}
+	| {
+		// indicar que ja foi implementado
+		procedimentoAtual->declarada = 1;
+		char print[100];
+		sprintf(print, procedimentoAtual->rotulo, nivel_lexico);
+		geraCodigo(procedimentoAtual->rotulo, print);
+
+	} bloco;
 
 %%
 

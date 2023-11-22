@@ -36,6 +36,7 @@ typedef struct type_info_tabela_simbolos
     tipo_passagem passagem;
     parametro_nao_conhecido *params;
     struct type_info_tabela_simbolos *prox;
+    int declarada;
 } type_info_tabela_simbolos;
 
 typedef struct pilha_simbolos

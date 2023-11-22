@@ -89,7 +89,8 @@ extern int yydebug;
     READ = 290,                    /* READ  */
     WRITE = 291,                   /* WRITE  */
     PROCEDURE = 292,               /* PROCEDURE  */
-    FUNCTION = 293                 /* FUNCTION  */
+    FUNCTION = 293,                /* FUNCTION  */
+    T_FORWARD = 294                /* T_FORWARD  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
