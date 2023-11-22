@@ -1,0 +1,2 @@
+A alteração não está funcionando corretamente, no “forward1.pas” ele está dando um segmentation fault antes de entrar no main.
+E no “forward2.pas” está apresentando problemas ao finalizar a leitura do procedure, mais detalhes na resposta “Parte3.txt”.

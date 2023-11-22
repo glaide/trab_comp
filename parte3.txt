@@ -1,0 +1,18 @@
+
+
+Descreva a idéia original para abordar a alteração;
+A ideia original foi implementar o “nó” sintático “regra_forward_ou_bloco” para fazer a chamada do forward. Seguindo o padrão dos outros nós que vimos em aula e no livro do Thomaz. Ela funciona da seguinte maneira: ao ler um procedimento ou função, ao final da regra é esperado encontrar o token "forward" ou seguir a lógica do bloco original. A regra "regra_forward_ou_bloco" é encontrada após: parametros_formais_vazio PONTO_E_VIRGULA, dentro da declaração de função/procedimento.
+
+
+• O que deu certo e o que teve de ser modificado no trajeto?
+A implementação seguindo o princípio do forward, acreditamos ter sido implementada corretamente, pois no exemplo "forward1.pas" foi possível ler todo o programa, incluindo o token "forward", e a declaração das funções.
+Foi necessário também adicionar uma variável para saber se o procedimento/função já havia sido declarado ou não.
+Essa variável chamada "declarada" foi usada também como forma de verificação, na declaração da função/procedimento, para saber se era possível seguir o fluxo normal ou não.
+Quando ele lê “Program” (com a o’ P’ maiúsculo ) ele não reconhece o token:
+Solução: Foi adicionar “Program” (com a o’ P’ maiúsculo ) na lista de identificadores no compilador.l.
+
+
+• Quais os maiores problemas para fazer funcionar?
+Conseguir montar a árvore sintática corretamente, visto que, após adicionar o forward ele começou a apresentar problemas em ler procedures no exemplo "forward2.pas".
+Após ler as funções, dentro do arquivo "forward1.pas", obtivemos um segmentation fault. Dado o tempo, não conseguimos descobrir qual foi o problema.
+Ao ler um token muito grande como nome do programa, ocorre um erro de segmentation fault.
